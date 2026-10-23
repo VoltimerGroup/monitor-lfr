@@ -328,3 +328,49 @@ def test_log_jsonl_ograniczony_do_maks_wpisow(tmp_path, html_dzis: str):
     wpis = json.loads(linie[-1])
     assert wpis["status_http"] == 200 and wpis["zmiana"] is False and wpis["wynik"] == "ok"
     assert {"czas", "czas_lokalny", "proby", "wyslane", "blad"} <= wpis.keys()
+
+
+# ------------------------------------------------------------------ poprawki po recenzji 23.10.2026
+
+def test_zapowiedz_obok_wzmianki_o_minionym_naborze_to_pilne(po_bazie: Srodowisko, html_dzis: str):
+    """Wada 2: przeszła data „w dniu 29.09.2026” nie może zamienić zapowiedzi w INFO."""
+    blok = ("<p>KOMUNIKAT: W związku z zakończeniem naboru przeprowadzonego w dniu 29.09.2026 r. informujemy, "
+            "że kolejny nabór wniosków dla woj. lubelskiego i mazowieckiego planowany jest na styczeń 2027 r.</p>"
+            "<p>……………</p>")
+    po_bazie.uruchom(dopisz_na_gorze(html_dzis, blok), T0 + timedelta(minutes=10))
+    assert len(_pilne(po_bazie.nowe)) == 1, po_bazie.nowe
+    msg = po_bazie.nowe[0]
+    assert ">>> DOTYCZY TWOICH WOJEWÓDZTW: lubelskie, mazowieckie <<<" in msg
+    assert "Planowany termin: na styczeń 2027 r" in msg
+    assert "już się odbył" not in msg
+
+
+def test_grudniowe_ogloszenie_bez_roku_daje_pilne_i_przypomnienia(srodowisko: Srodowisko, html_dzis: str):
+    """Wada 4: „od dnia 15 stycznia” opublikowane 10.12.2026 to 15.01.2027, nie 15.01.2026."""
+    grudzien = w_warszawie(2026, 12, 10, 8, 0)
+    srodowisko.uruchom(html_dzis, grudzien)
+    blok = ("<p><strong>IV NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie</strong></p>"
+            "<p>Informujemy, że od dnia 15 stycznia (od godz. 8:30) Lubelska Fundacja Rozwoju przyjmować "
+            "będzie wnioski o niskooprocentowaną pożyczkę.</p><p>……………</p>")
+    srodowisko.uruchom(dopisz_na_gorze(html_dzis, blok), grudzien + timedelta(minutes=10))
+    assert len(_pilne(srodowisko.nowe)) == 1, srodowisko.nowe
+    assert "15.01.2027, godz. 8:30" in srodowisko.nowe[0]
+    przyp = [p for p in srodowisko.stan()["przypomnienia"] if p["status"] == "oczekuje"]
+    assert len(przyp) == 3
+
+
+def test_zmiana_planowanego_terminu_w_miejscu_to_pilne_raz(srodowisko: Srodowisko, html_dzis: str):
+    """Wada 5: „planowany jest na marzec” -> „na kwiecień” w tej samej linii to PILNE (i tylko raz)."""
+    zapowiedz = ("<p>Uprzejmie informujemy, że kolejny nabór wniosków o pożyczkę w ramach Instrumentu "
+                 "Finansowego Pierwszy Biznes – Wsparcie w Starcie planowany jest na marzec 2027 r.</p><p>……………</p>")
+    srodowisko.uruchom(dopisz_na_gorze(html_dzis, zapowiedz), T0)
+    assert srodowisko.nowe == []  # wersja bazowa
+    zmieniona = dopisz_na_gorze(html_dzis, zapowiedz.replace("na marzec 2027", "na kwiecień 2027"))
+    srodowisko.uruchom(zmieniona, T0 + timedelta(minutes=10))
+    assert len(srodowisko.nowe) == 1, srodowisko.nowe
+    msg = srodowisko.nowe[0]
+    assert msg.startswith(TYTUL_PILNY)
+    assert "UWAGA: ZMIANA PLANOWANEGO TERMINU (poprzednio: na marzec 2027 r" in msg
+    assert "Planowany termin: na kwiecień 2027 r" in msg
+    srodowisko.uruchom(zmieniona, T0 + timedelta(minutes=20))
+    assert srodowisko.nowe == []  # bez duplikatu

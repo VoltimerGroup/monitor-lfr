@@ -14,6 +14,8 @@ from datetime import time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from .klasyfikacja import kanoniczne_wojewodztwo
+
 KATALOG_GLOWNY = Path(__file__).resolve().parent.parent
 DOMYSLNY_PLIK = KATALOG_GLOWNY / "config.json"
 DOMYSLNY_KATALOG_STANU = KATALOG_GLOWNY / "state"
@@ -119,6 +121,26 @@ def _parsuj_wyprzedzenie(tekst: str) -> Przypomnienie:
     return Przypomnienie(f"{n} min", timedelta(minutes=n))
 
 
+def _moje_wojewodztwa(wartosc) -> list[str]:
+    """Nazwy z config.json -> postać kanoniczna („Mazowieckie”, „mazowieckim” -> „mazowieckie”).
+
+    Nierozpoznana nazwa to błąd konfiguracji: lepiej czerwony przebieg niż alert
+    „NIE dotyczy Twoich województw” i zero przypomnień przy naborze, który Cię dotyczy.
+    """
+    if not isinstance(wartosc, list) or not wartosc:
+        raise BladKonfiguracji('moje_wojewodztwa: podaj listę, np. ["mazowieckie", "lubelskie"]')
+    wynik: list[str] = []
+    for nazwa in wartosc:
+        kanoniczna = kanoniczne_wojewodztwo(nazwa) if isinstance(nazwa, str) else None
+        if kanoniczna is None:
+            raise BladKonfiguracji(
+                f"moje_wojewodztwa: nie rozpoznano województwa {nazwa!r} "
+                "(wpisz jedną nazwę na pozycję, np. \"mazowieckie\")")
+        if kanoniczna not in wynik:
+            wynik.append(kanoniczna)
+    return wynik
+
+
 def z_slownika(dane: dict) -> Konfiguracja:
     """Buduje konfigurację ze słownika (scalonego z domyślnymi)."""
     c = _scal(DOMYSLNE, dane)
@@ -132,7 +154,7 @@ def z_slownika(dane: dict) -> Konfiguracja:
         )
         return Konfiguracja(
             url=str(c["url"]),
-            moje_wojewodztwa=[str(w) for w in c["moje_wojewodztwa"]],
+            moje_wojewodztwa=_moje_wojewodztwa(c["moje_wojewodztwa"]),
             strefa=ZoneInfo(str(c["strefa_czasowa"])),
             kanal=str(c["kanal"]).lower(),
             heartbeat_wlaczony=bool(c["heartbeat"]["wlaczony"]),

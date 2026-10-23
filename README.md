@@ -78,18 +78,29 @@ z polskimi znakami lub bez, z dowolnym myślnikiem):
 Żeby nie było fałszywych PILNYCH, dwa wyjątki dają **INFO**:
 
 - zmiana **istniejącej** linii, w której nie doszedł żaden nowy wzorzec ani nie zmienił się
-  termin/kwota – np. dopisek „– NABÓR ZAMKNIĘTY” w nagłówku starego naboru;
-- ogłoszenie, którego **start był ponad 24 godziny temu** – np. publikacja listy wniosków
-  z naboru, który już się odbył.
+  termin, kwota ani planowany termin z zapowiedzi – np. dopisek „– NABÓR ZAMKNIĘTY”
+  w nagłówku starego naboru;
+- ogłoszenie, którego **start był ponad 24 godziny temu** i które nie zapowiada kolejnego
+  naboru – np. publikacja listy wniosków z naboru, który już się odbył.
 
 Zmiana terminu w ogłoszeniu daje PILNE z dopiskiem „UWAGA: ZMIANA TERMINU”, a stare
-przypomnienia są anulowane.
+przypomnienia są anulowane. Zmiana miesiąca w zapowiedzi („planowany jest na maj” → „na
+czerwiec”) daje PILNE z dopiskiem „UWAGA: ZMIANA PLANOWANEGO TERMINU”.
 
 Z PILNEGO fragmentu monitor wyciąga: numer naboru (rzymski lub arabski), województwa,
 datę startu („15 stycznia 2027 r.”, „15.01.2027”, „2027-01-15”, „16 czerwca br.”), godzinę
 („8:30”, „8.30”), pulę („2 000 000,00 zł”, kilka pul = suma). Gdy czegoś brakuje w samym
 fragmencie, dopełnia to z początku tej samej sekcji ogłoszenia (między liniami „………”).
 Gdy godziny nie podano, do przypomnień przyjmuje 8:00 i pisze to wprost w alercie.
+
+Jak monitor wybiera datę startu, gdy we fragmencie jest kilka dat (np. „w związku
+z zakończeniem naboru z dnia 29.09.2026 r. … kolejny nabór od dnia 15 stycznia 2027 r.”):
+liczą się tylko daty **przyszłe** (albo sprzed najwyżej doby). Spośród nich wygrywa data przy
+najpewniejszym sformułowaniu: najpierw szablon LFR „od dnia X r. (od godz. Y)”, potem
+„Rozpoczęcie naboru”, „nabór rozpocznie się”, „od dnia”, „w dniu”, a na końcu sama data.
+Przy tym samym sformułowaniu – najbliższa. Data bez roku dostaje rok, przy którym wypada
+najbliżej dzisiejszego dnia (w grudniu „15 stycznia” = styczeń następnego roku);
+„br.” to zawsze bieżący rok.
 
 ---
 
@@ -171,9 +182,16 @@ Co robi workflow `.github/workflows/monitor.yml`:
 
 - cron `2-59/10 * * * *` – co 10 minut (minuty :02, :12, …, :52),
 - `concurrency` – przebiegi nie nakładają się, trwający nie jest anulowany,
+- `actions/checkout` z `ref: ${{ github.ref_name }}` – przebieg, który czekał w kolejce,
+  pobiera **czubek gałęzi** (ze stanem zapisanym przed chwilą przez poprzedni przebieg), a nie
+  commit z chwili wywołania – inaczej czytałby stary `stan.json` i wysłał te same alerty drugi
+  raz. Dlatego „Run workflow” w trakcie przebiegu z crona jest bezpieczne,
 - `actions/setup-python` z cache pip,
 - uruchomienie `python -m monitor_lfr` z sekretami w zmiennych środowiskowych,
 - **commit `state/stan.json` tylko, gdy się zmienił** (tożsamość bota `github-actions[bot]`).
+  Jeśli ktoś w międzyczasie wypchnął commit, krok robi rebase na czubek gałęzi (przy konflikcie
+  w plikach stanu wygrywa wersja z tego przebiegu – ona pamięta wysłane przed chwilą alerty),
+  a nieudany rebase przerywa (`git rebase --abort`) przed kolejną z 3 prób.
   Stan zmienia się przy zdarzeniach (nowa wersja strony, alert, przypomnienie, błędy,
   heartbeat) oraz **raz na dobę** (pole `znacznik_zycia`) – ten codzienny commit sprawia,
   że GitHub nie wyłączy harmonogramu po 60 dniach bez aktywności w repozytorium,
@@ -223,7 +241,11 @@ Plik `config.json` (sekretów NIE wpisuj tutaj):
 | `log.max_wpisow` | `2000` | ile ostatnich wpisów trzyma `state/log.jsonl` |
 
 **Zmiana województw:** popraw `moje_wojewodztwa`, np. `["mazowieckie"]`. Można pisać w dowolnej
-odmianie („mazowieckim”) – monitor sprowadza nazwy do postaci kanonicznej.
+odmianie i wielkości liter („Mazowieckie”, „mazowieckim”) – monitor sprowadza nazwy do postaci
+kanonicznej. Jedna pozycja = jedno województwo. Nazwa, której monitor nie rozpozna (np.
+„Mazury”), albo dwa województwa w jednej pozycji to **błąd konfiguracji**: przebieg kończy się
+na czerwono z komunikatem „BŁĄD KONFIGURACJI: moje_wojewodztwa: nie rozpoznano…” – zamiast
+po cichu oznaczać nabory jako „NIE dotyczy Twoich województw” i nie planować przypomnień.
 
 **Zmiana częstotliwości:** w `.github/workflows/monitor.yml` zmień linię `cron`. Przykłady:
 
@@ -314,6 +336,9 @@ tworzy nowy monitor czytający stan z dysku – jak restart w Actions. Pokrywaj�
 | (g) heartbeat raz na dobę po 9:00 czasu polskiego | `test_g_*` |
 | (h) spóźnione przypomnienie wychodzi raz | `test_h_*` |
 | (i) zmiana samych białych znaków/myślników → brak alertu | `test_i_*` |
+| województwa z `config.json` w dowolnej odmianie; nierozpoznane = błąd konfiguracji | `tests/test_konfiguracja.py` |
+| przeszła data obok przyszłej, data bez roku w grudniu, zmiana zapowiedzi | `tests/test_klasyfikacja.py` (sekcja „poprawki po recenzji”) |
+| workflow: checkout czubka gałęzi, commit stanu po równoległym commicie (prawdziwy git) | `tests/test_workflow.py` |
 
 Aktualizacja kopii strony: pobierz stronę do nowego pliku w `tests/fixtures/` i podmień nazwę
 w `tests/conftest.py` (`PLIK_STRONY`).

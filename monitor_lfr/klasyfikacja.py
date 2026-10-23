@@ -7,11 +7,13 @@ wzorce nie muszą znać wszystkich odmian myślników i spacji.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
+from .normalizacja import normalizuj
 from .porownanie import TEKST, Zmiana
 
 PILNE = "PILNE"
@@ -50,13 +52,18 @@ _DATA = (
 )
 
 # Kotwice daty startu – od najpewniejszej. Ostatnia (sama data) = pewność niska.
+# Najpierw szablon LFR („od dnia X r. (od godz. Y)”), potem słowa o naborze, a dopiero
+# potem ogólne „od dnia” / „w dniu”, które bywają też w zdaniach o czymś innym
+# („Od dnia 1 października biuro ma nowy adres”).
 _KOTWICE_STARTU: list[tuple[re.Pattern, bool]] = [
-    (re.compile(r"\bod\s+dnia\s*" + _DATA, _F), True),
+    (re.compile(r"\bod\s+dnia\s*" + _DATA + r"(?=[^()\n]{0,15}\(\s*od\s+godz)", _F), True),
     (re.compile(r"\brozpocz[ęe]ci[ea]\s+naboru\s*[-:]?\s*(?:w\s+dniu\s+|dnia\s+)?" + _DATA, _F), True),
     (re.compile(r"\brozpocznie\s+si[ęe]\s+(?:w\s+dniu\s+|dnia\s+)?" + _DATA, _F), True),
+    (re.compile(r"\bod\s+dnia\s*" + _DATA, _F), True),
     (re.compile(r"(?:\bw\s+dniu|(?<![zZ] )\bdnia)\s+" + _DATA, _F), True),
     (re.compile(r"(?<![\d.])" + _DATA, _F), False),
 ]
+_SAMA_DATA = _KOTWICE_STARTU[-1][0]
 
 _GODZ_PO_DACIE = re.compile(r"godz\w*\.?\s*(\d{1,2})\s*[:.]\s*(\d{2})\b", _F)
 _GODZ_TUZ_PO_DACIE = re.compile(r"^\s*(?:r\.?\s*)?,?\s*(\d{1,2}):(\d{2})\b", _F)
@@ -101,7 +108,37 @@ _PO_WOJ = re.compile(r"\bwoj(?:\.|ew[oó]dztw\w*)\s*:?\s*([^.;()\n]{1,200})", _F
 # Nazwa fundacji zawiera „Lubelska” – to NIE jest województwo.
 _FUNDACJA = re.compile(r"\blubels\w*\s+fundacj\w*(?:\s+rozwoju)?", _F)
 
-_ZAPOWIEDZ = re.compile(r"\b(?:planowan[aey]\s+jest|jest\s+planowan[aey])\s+([^.\n]{1,60}(?:\s*r\.)?)", _F)
+# Zapowiedź („planowany jest na maj 2026 r.”) – do kropki, nawiasu albo dopisku po myślniku
+# („… na maj 2026 – termin ZMIENIONY …”), najwyżej 60 znaków.
+_ZAPOWIEDZ = re.compile(
+    r"\b(?:planowan[aey]\s+jest|jest\s+planowan[aey])\s+((?:(?!\s-\s)[^.\n(;]){1,60})", _F)
+
+# Rdzenie nazw miesięcy bez ogonków – pasują do każdego przypadku („maj/maja/maju”, „styczeń/stycznia”).
+_RDZENIE_MIESIECY = [
+    ("stycz", 1), ("lut", 2), ("marz", 3), ("marc", 3), ("kwie", 4), ("maj", 5), ("czerw", 6),
+    ("lip", 7), ("sierp", 8), ("wrze", 9), ("pazdziern", 10), ("listopad", 11), ("grud", 12),
+]
+
+# Ogłoszenie, którego start minął dawno temu, to informacja „po fakcie”
+# (np. publikacja listy wniosków z dawnego naboru) – nie PILNE.
+PROG_HISTORYCZNY = timedelta(hours=24)
+
+
+@dataclass(frozen=True)
+class Odniesienie:
+    """Chwila sprawdzenia – do odróżniania dat przyszłych od przeszłych i do uzupełniania roku."""
+
+    teraz: datetime
+    strefa: ZoneInfo
+    godzina_gdy_brak: time
+
+    @property
+    def dzis(self) -> date:
+        return self.teraz.astimezone(self.strefa).date()
+
+    def aktualna(self, d: date, g: time | None) -> bool:
+        """Czy start (d, g) nie jest „po fakcie” (minął najwyżej PROG_HISTORYCZNY temu)."""
+        return datetime.combine(d, g or self.godzina_gdy_brak, tzinfo=self.strefa) >= self.teraz - PROG_HISTORYCZNY
 
 
 @dataclass
@@ -181,17 +218,44 @@ def _wojewodztwa_w(tekst: str) -> list[str]:
 
 
 def kanoniczne_wojewodztwo(nazwa: str) -> str | None:
-    """„Mazowieckim”, „mazowieckie” -> „mazowieckie” (do porównań z konfiguracją)."""
-    w = _wojewodztwa_w(nazwa)
-    return w[0] if w else None
+    """„Mazowieckim”, „Mazowieckie” -> „mazowieckie” (do porównań z konfiguracją).
+
+    None, gdy w napisie nie ma województwa albo jest ich kilka („mazowieckie, lubelskie”).
+    """
+    w = _wojewodztwa_w(normalizuj(str(nazwa)))
+    return w[0] if len(w) == 1 else None
 
 
-def _data_z_dopasowania(m: re.Match, rok_biezacy: int) -> date | None:
+def _rok_najblizszy(dzien: int, miesiac: int, dzis: date) -> int:
+    """Rok dla daty bez roku: ten z (poprzedni, bieżący, następny), który daje datę najbliższą dziś.
+
+    10.12.2026 „od dnia 15 stycznia” -> 15.01.2027 (a nie 15.01.2026 – prawie rok temu);
+    23.10.2026 „w dniu 16 czerwca” -> 16.06.2026 (odwołanie do minionego naboru).
+    """
+    najlepszy, odleglosc = dzis.year, None
+    for rok in (dzis.year - 1, dzis.year, dzis.year + 1):
+        try:
+            d = date(rok, miesiac, dzien)
+        except ValueError:
+            continue
+        o = abs((d - dzis).days)
+        if odleglosc is None or o < odleglosc or (o == odleglosc and d > dzis):
+            najlepszy, odleglosc = rok, o
+    return najlepszy
+
+
+def _data_z_dopasowania(m: re.Match, rok_biezacy: int, odn: Odniesienie | None = None) -> date | None:
     g = m.groupdict()
     try:
         if g.get("d1"):
-            rok = int(g["r1"]) if g.get("r1") else rok_biezacy
-            return date(rok, MIESIACE_DOPELNIACZ[g["mies"].lower()], int(g["d1"]))
+            miesiac, dzien = MIESIACE_DOPELNIACZ[g["mies"].lower()], int(g["d1"])
+            if g.get("r1"):
+                rok = int(g["r1"])
+            elif g.get("br") or odn is None:
+                rok = rok_biezacy  # „br.” = bieżący rok
+            else:
+                rok = _rok_najblizszy(dzien, miesiac, odn.dzis)
+            return date(rok, miesiac, dzien)
         if g.get("d2"):
             return date(int(g["r2"]), int(g["m2"]), int(g["d2"]))
         if g.get("r3"):
@@ -208,20 +272,66 @@ def _godzina(h: str, m: str) -> time | None:
         return None
 
 
-def wyciagnij_start(tekst: str, rok_biezacy: int) -> tuple[date | None, time | None, bool]:
-    """(data startu, godzina startu, czy data pewna)."""
-    for wzor, pewna in _KOTWICE_STARTU:
+@dataclass
+class _Kandydat:
+    data: date
+    godzina: time | None
+    pewna: bool
+    poziom: int  # numer kotwicy w _KOTWICE_STARTU (0 = najpewniejsza)
+    pozycja: int  # miejsce w tekście
+
+
+def _kandydaci_startu(tekst: str, rok_biezacy: int, odn: Odniesienie | None) -> list[_Kandydat]:
+    """Wszystkie daty z kotwicami (i bez) – fragment bywa pełen odwołań do dawnych naborów."""
+    poczatki_dat = [m.start() for m in _SAMA_DATA.finditer(tekst)]
+    wynik: list[_Kandydat] = []
+    for poziom, (wzor, pewna) in enumerate(_KOTWICE_STARTU):
         for m in wzor.finditer(tekst):
-            d = _data_z_dopasowania(m, rok_biezacy)
+            d = _data_z_dopasowania(m, rok_biezacy, odn)
             if d is None:
                 continue
-            za_data = tekst[m.end(): m.end() + 100]
-            # Kolejność: „(od godz. 8:30)” tuż za datą -> „godz. 8:30” blisko daty ->
-            # „8:30” zaraz po dacie -> „od godz.” gdziekolwiek we fragmencie.
+            # Godziny szukamy tylko do następnej daty – żeby nie „pożyczyć” godziny innego terminu.
+            nastepna = min((p for p in poczatki_dat if p >= m.end()), default=len(tekst))
+            za_data = tekst[m.end(): min(m.end() + 100, nastepna)]
+            # Kolejność: „(od godz. 8:30)” tuż za datą -> „godz. 8:30” blisko daty -> „8:30” zaraz po dacie.
             g = (_OD_GODZ.search(za_data) or _GODZ_PO_DACIE.search(za_data[:40])
-                 or _GODZ_TUZ_PO_DACIE.search(za_data) or _OD_GODZ.search(tekst))
-            return d, (_godzina(g.group(1), g.group(2)) if g else None), pewna
-    return None, None, True
+                 or _GODZ_TUZ_PO_DACIE.search(za_data))
+            wynik.append(_Kandydat(d, _godzina(g.group(1), g.group(2)) if g else None, pewna, poziom, m.start()))
+    # „od godz.” gdziekolwiek we fragmencie – tylko gdy fragment mówi o jednej dacie.
+    if len({k.data for k in wynik}) == 1:
+        g = _OD_GODZ.search(tekst)
+        for k in wynik:
+            if k.godzina is None and g:
+                k.godzina = _godzina(g.group(1), g.group(2))
+    return wynik
+
+
+def _wybierz_start(kandydaci: list[_Kandydat], odn: Odniesienie | None) -> _Kandydat | None:
+    """Data startu spośród kandydatów.
+
+    Z odniesieniem („teraz”): liczą się daty jeszcze aktualne – z najpewniejszej kotwicy,
+    a w jej obrębie najbliższa. Data bez kotwicy wygrywa tylko wtedy, gdy żadna data
+    z kotwicą nie jest aktualna. Gdy aktualnych brak (albo nie ma odniesienia): pierwsza
+    data najpewniejszej kotwicy – klasyfikacja uzna ją za nabór, który już się odbył.
+    """
+    if not kandydaci:
+        return None
+    if odn is not None:
+        aktualne = [k for k in kandydaci if odn.aktualna(k.data, k.godzina)]
+        pula = [k for k in aktualne if k.pewna] or aktualne
+        if pula:
+            poziom = min(k.poziom for k in pula)
+            return min((k for k in pula if k.poziom == poziom),
+                       key=lambda k: (k.data, k.godzina or odn.godzina_gdy_brak, k.pozycja))
+    poziom = min(k.poziom for k in kandydaci)
+    return min((k for k in kandydaci if k.poziom == poziom), key=lambda k: k.pozycja)
+
+
+def wyciagnij_start(tekst: str, rok_biezacy: int,
+                    odn: Odniesienie | None = None) -> tuple[date | None, time | None, bool]:
+    """(data startu, godzina startu, czy data pewna)."""
+    k = _wybierz_start(_kandydaci_startu(tekst, rok_biezacy, odn), odn)
+    return (k.data, k.godzina, k.pewna) if k else (None, None, True)
 
 
 def wyciagnij_kwoty(tekst: str) -> list[Decimal]:
@@ -240,12 +350,53 @@ def wyciagnij_zapowiedz(tekst: str) -> str | None:
     return m.group(1).strip() if m else None
 
 
-def wyciagnij_dane(tekst: str, kontekst: str = "", rok_biezacy: int | None = None) -> DaneNaboru:
-    """Dane z fragmentu; brakujące pola uzupełniane z kontekstu (sekcji ogłoszenia)."""
-    rok = rok_biezacy or date.today().year
-    dane = _dane_z(tekst, rok)
+def _bez_ogonkow(tekst: str) -> str:
+    t = unicodedata.normalize("NFKD", tekst.replace("ł", "l").replace("Ł", "L"))
+    return "".join(z for z in t if not unicodedata.combining(z)).casefold()
+
+
+def klucz_zapowiedzi(zapowiedz: str | None) -> str | None:
+    """Klucz do porównania dwóch zapowiedzi: bez ogonków, wielkości liter, interpunkcji i „r.”."""
+    if zapowiedz is None:
+        return None
+    slowa = re.findall(r"\w+", _bez_ogonkow(zapowiedz))
+    while slowa and slowa[-1] in ("r", "roku", "br"):
+        slowa.pop()
+    return " ".join(slowa)
+
+
+def zapowiedz_aktualna(zapowiedz: str, odn: Odniesienie) -> bool:
+    """False tylko wtedy, gdy zapowiedź wyraźnie wskazuje termin, który już minął.
+
+    Dokładna data -> próg PROG_HISTORYCZNY; miesiąc z rokiem -> czy miesiąc minął;
+    sam rok -> czy rok minął. Bez roku (np. „na wiosnę”) -> aktualna (lepiej powiadomić).
+    """
+    for m in _SAMA_DATA.finditer(zapowiedz):
+        d = _data_z_dopasowania(m, odn.dzis.year, odn)
+        if d is not None:
+            return odn.aktualna(d, None)
+    slowa = re.findall(r"\w+", _bez_ogonkow(zapowiedz))
+    lata = {int(s) for s in slowa if re.fullmatch(r"20\d\d", s)}
+    if not lata:
+        return True
+    miesiace = [nr for s in slowa for rdzen, nr in _RDZENIE_MIESIECY if s.startswith(rdzen)]
+    dzis = odn.dzis
+    if len(lata) == 1 and miesiace:
+        return (max(lata), max(miesiace)) >= (dzis.year, dzis.month)
+    return max(lata) >= dzis.year
+
+
+def wyciagnij_dane(tekst: str, kontekst: str = "", rok_biezacy: int | None = None,
+                   odn: Odniesienie | None = None) -> DaneNaboru:
+    """Dane z fragmentu; brakujące pola uzupełniane z kontekstu (sekcji ogłoszenia).
+
+    Z odniesieniem (`odn`) data startu to najbliższa aktualna data z kotwicą, a data bez
+    roku dostaje rok najbliższy dziś (ogłoszenie z grudnia o „15 stycznia” = następny rok).
+    """
+    rok = rok_biezacy or (odn.dzis.year if odn else date.today().year)
+    dane = _dane_z(tekst, rok, odn)
     if kontekst and kontekst != tekst:
-        z_kontekstu = _dane_z(kontekst, rok)
+        z_kontekstu = _dane_z(kontekst, rok, odn)
         if dane.numer is None:
             dane.numer, dane.numer_liczba = z_kontekstu.numer, z_kontekstu.numer_liczba
         if not dane.wojewodztwa:
@@ -262,9 +413,9 @@ def wyciagnij_dane(tekst: str, kontekst: str = "", rok_biezacy: int | None = Non
     return dane
 
 
-def _dane_z(tekst: str, rok: int) -> DaneNaboru:
+def _dane_z(tekst: str, rok: int, odn: Odniesienie | None = None) -> DaneNaboru:
     numer, liczba = wyciagnij_numer(tekst)
-    d, g, pewna = wyciagnij_start(tekst, rok)
+    d, g, pewna = wyciagnij_start(tekst, rok, odn)
     return DaneNaboru(
         numer=numer, numer_liczba=liczba, wojewodztwa=wyciagnij_wojewodztwa(tekst),
         data_startu=d, godzina_startu=g, pewna_data=pewna,
@@ -278,11 +429,6 @@ def dopasowane_wzorce(tekst: str) -> list[str]:
 
 # ---------------------------------------------------------------- klasyfikacja
 
-# Ogłoszenie, którego start minął dawno temu, to informacja „po fakcie”
-# (np. publikacja listy wniosków z dawnego naboru) – nie PILNE.
-PROG_HISTORYCZNY = timedelta(hours=24)
-
-
 @dataclass
 class Klasyfikacja:
     poziom: str  # PILNE / INFO
@@ -292,6 +438,7 @@ class Klasyfikacja:
     start: datetime | None = None
     zmiana_terminu: bool = False
     poprzedni_start: datetime | None = None
+    poprzednia_zapowiedz: str | None = None  # gdy zmienił się planowany termin („na maj” -> „na czerwiec”)
 
 
 def klasyfikuj(zmiana: Zmiana, teraz: datetime, strefa: ZoneInfo, godzina_gdy_brak: time) -> Klasyfikacja:
@@ -302,7 +449,8 @@ def klasyfikuj(zmiana: Zmiana, teraz: datetime, strefa: ZoneInfo, godzina_gdy_br
     if not wz_nowe:
         return Klasyfikacja(INFO, "inna zmiana")
 
-    rok = teraz.astimezone(strefa).year
+    odn = Odniesienie(teraz, strefa, godzina_gdy_brak)
+    rok = odn.dzis.year
 
     def start_wiarygodny(d: DaneNaboru) -> datetime | None:
         """Przeszła data BEZ kotwicy to raczej odwołanie do dawnego naboru niż start nowego."""
@@ -312,25 +460,38 @@ def klasyfikuj(zmiana: Zmiana, teraz: datetime, strefa: ZoneInfo, godzina_gdy_br
             return None
         return s
 
-    dane = wyciagnij_dane(zmiana.tekst_nowy, "\n".join(zmiana.kontekst), rok)
+    dane = wyciagnij_dane(zmiana.tekst_nowy, "\n".join(zmiana.kontekst), rok, odn)
     start = start_wiarygodny(dane)
+    # Zapowiedź bierzemy tylko z NOWEGO fragmentu – stara zapowiedź z sekcji nie jest nowiną.
+    zapowiedz = wyciagnij_zapowiedz(zmiana.tekst_nowy)
+    zapowiedz_akt = zapowiedz is not None and zapowiedz_aktualna(zapowiedz, odn)
 
-    # Zmiana istniejącej linii: PILNE tylko, gdy doszedł NOWY wzorzec albo zmieniły się
-    # dane (termin/kwota). Dopisek „– NABÓR ZAMKNIĘTY” w starym nagłówku to INFO.
-    zmiana_terminu, poprzedni_start = False, None
+    # Zmiana istniejącej linii: PILNE tylko, gdy doszedł NOWY wzorzec albo zmieniły się dane
+    # (termin, kwota, planowany termin). Dopisek „– NABÓR ZAMKNIĘTY” w starym nagłówku to INFO.
+    zmiana_terminu, poprzedni_start, poprzednia_zapowiedz = False, None, None
     if zmiana.stare:
         wz_stare = set(dopasowane_wzorce(zmiana.tekst_stary))
         nowe_wzorce = [w for w in wz_nowe if w not in wz_stare]
-        dane_frag = wyciagnij_dane(zmiana.tekst_nowy, "", rok)
-        dane_stare = wyciagnij_dane(zmiana.tekst_stary, "", rok)
+        dane_frag = wyciagnij_dane(zmiana.tekst_nowy, "", rok, odn)
+        dane_stare = wyciagnij_dane(zmiana.tekst_stary, "", rok, odn)
         start_frag = start_wiarygodny(dane_frag)
         poprzedni_start = start_wiarygodny(dane_stare)
         termin_inny = start_frag is not None and start_frag != poprzedni_start
         kwota_inna = bool(dane_frag.kwoty) and dane_frag.kwoty != dane_stare.kwoty
-        if not nowe_wzorce and not termin_inny and not kwota_inna:
+        zapowiedz_inna = zapowiedz_akt and klucz_zapowiedzi(zapowiedz) != klucz_zapowiedzi(dane_stare.zapowiedz)
+        if not nowe_wzorce and not termin_inny and not kwota_inna and not zapowiedz_inna:
             return Klasyfikacja(INFO, "zmiana w istniejącym ogłoszeniu", wz_nowe, dane, start)
         zmiana_terminu = termin_inny and poprzedni_start is not None
+        if zapowiedz_inna and dane_stare.zapowiedz is not None:
+            poprzednia_zapowiedz = dane_stare.zapowiedz
 
     if start is not None and start < teraz - PROG_HISTORYCZNY:
-        return Klasyfikacja(INFO, "dotyczy naboru, który już się odbył", wz_nowe, dane, start)
-    return Klasyfikacja(PILNE, "nowe ogłoszenie", wz_nowe, dane, start, zmiana_terminu, poprzedni_start)
+        if not zapowiedz_akt:
+            return Klasyfikacja(INFO, "dotyczy naboru, który już się odbył", wz_nowe, dane, start)
+        # Fragment wspomina miniony nabór, ale zapowiada kolejny – PILNE bez daty startu
+        # (data z fragmentu dotyczy minionego naboru, a nie zapowiadanego).
+        dane.data_startu, dane.godzina_startu, dane.pewna_data = None, None, True
+        dane.zapowiedz = zapowiedz
+        start, zmiana_terminu = None, False
+    return Klasyfikacja(PILNE, "nowe ogłoszenie", wz_nowe, dane, start, zmiana_terminu, poprzedni_start,
+                        poprzednia_zapowiedz)

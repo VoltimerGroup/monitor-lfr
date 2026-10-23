@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from .klasyfikacja import Klasyfikacja
+from .klasyfikacja import Klasyfikacja, kanoniczne_wojewodztwo
 from .porownanie import (
     LINK_NOWY, LINK_USUNIETY, LINK_ZMIENIONY, PLIK_NOWY, PLIK_USUNIETY, PLIK_ZMIENIONY,
     TEKST_DOKUMENTOW, Zmiana,
@@ -87,7 +87,9 @@ def oznaczenie_wojewodztw(wojewodztwa: list[str], moje: list[str]) -> tuple[str,
     """Zwraca (status, linia): status = TAK / NIE / NIEZNANE."""
     if not wojewodztwa:
         return "NIEZNANE", ">>> NIE ODCZYTANO WOJEWÓDZTW – sprawdź w ogłoszeniu, czy dotyczy Ciebie <<<"
-    wspolne = [w for w in wojewodztwa if w in moje]
+    # Porównanie po postaci kanonicznej (konfiguracja jest już kanoniczna – to druga linia obrony).
+    moje_kan = {kanoniczne_wojewodztwo(m) or m for m in moje}
+    wspolne = [w for w in wojewodztwa if (kanoniczne_wojewodztwo(w) or w) in moje_kan]
     if wspolne:
         return "TAK", f">>> DOTYCZY TWOICH WOJEWÓDZTW: {', '.join(wspolne)} <<<"
     return "NIE", f">>> NIE dotyczy Twoich województw ({', '.join(moje)}) <<<"
@@ -118,6 +120,8 @@ def alert_pilny(
     linie.append(oznaczenie)
     if k.zmiana_terminu and k.poprzedni_start:
         linie.append(f"UWAGA: ZMIANA TERMINU (poprzednio: {format_daty(k.poprzedni_start, strefa)})")
+    if k.poprzednia_zapowiedz:
+        linie.append(f"UWAGA: ZMIANA PLANOWANEGO TERMINU (poprzednio: {k.poprzednia_zapowiedz})")
     linie.append("Województwa: " + (", ".join(d.wojewodztwa) if d and d.wojewodztwa else "nie odczytano"))
     linie.append("Nabór: " + (d.numer if d and d.numer else "numer nieodczytany"))
     if k.start is not None:

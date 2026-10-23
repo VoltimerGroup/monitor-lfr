@@ -9,11 +9,12 @@ import pytest
 
 from conftest import WAW, w_warszawie
 from monitor_lfr.klasyfikacja import (
-    INFO, PILNE, dopasowane_wzorce, kanoniczne_wojewodztwo, klasyfikuj, wyciagnij_dane, wyciagnij_kwoty,
-    wyciagnij_numer, wyciagnij_start, wyciagnij_wojewodztwa,
+    INFO, PILNE, Odniesienie, dopasowane_wzorce, kanoniczne_wojewodztwo, klasyfikuj, wyciagnij_dane,
+    wyciagnij_kwoty, wyciagnij_numer, wyciagnij_start, wyciagnij_wojewodztwa, zapowiedz_aktualna,
 )
 from monitor_lfr.normalizacja import normalizuj
 from monitor_lfr.porownanie import TEKST, Zmiana
+from monitor_lfr.wiadomosci import alert_pilny, oznaczenie_wojewodztw
 
 TERAZ = w_warszawie(2026, 10, 23, 12, 0)
 GODZ_8 = time(8, 0)
@@ -134,6 +135,19 @@ def test_wojewodztwa(tekst, woj):
 def test_kanoniczne_wojewodztwo_z_konfiguracji():
     assert kanoniczne_wojewodztwo("Mazowieckie") == "mazowieckie"
     assert kanoniczne_wojewodztwo("lubelskim") == "lubelskie"
+    assert kanoniczne_wojewodztwo("WARMIŃSKO–MAZURSKIE") == "warmińsko-mazurskie"  # pauza zamiast dywizu
+    assert kanoniczne_wojewodztwo("dolnośląskie") == "dolnośląskie"
+
+
+@pytest.mark.parametrize("nazwa", ["Mazury", "xyz", "", "mazowieckie, lubelskie"])
+def test_kanoniczne_wojewodztwo_nierozpoznane_albo_kilka_naraz(nazwa):
+    assert kanoniczne_wojewodztwo(nazwa) is None
+
+
+def test_oznaczenie_wojewodztw_porownuje_postac_kanoniczna():
+    """Druga linia obrony: nawet niekanoniczne „moje” nie dają fałszywego „NIE dotyczy”."""
+    status, linia = oznaczenie_wojewodztw(["lubelskie", "mazowieckie"], ["Mazowieckie", "lubelskim"])
+    assert status == "TAK" and "DOTYCZY TWOICH WOJEWÓDZTW: lubelskie, mazowieckie" in linia
 
 
 def test_brakujace_dane_uzupelniane_z_kontekstu_sekcji():
@@ -211,3 +225,138 @@ def test_brak_godziny_przyjmuje_godzine_domyslna():
     k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
     assert k.poziom == PILNE
     assert k.start == w_warszawie(2027, 2, 10, 8, 0) and k.dane.godzina_startu is None
+
+
+# ------------------------------------------------------------------ poprawki po recenzji 23.10.2026
+# Wada 2: wcześniejsza, PRZESZŁA data w tym samym fragmencie („w dniu 29.09.2026”, „Od dnia
+# 1 października”) zamieniała prawdziwe ogłoszenie albo zapowiedź w INFO „nabór już się odbył”.
+
+def test_zapowiedz_po_wzmiance_o_minionym_naborze_to_pilne_bez_daty():
+    z = _zmiana(["W związku z zakończeniem naboru przeprowadzonego w dniu 29.09.2026 r. informujemy, że kolejny "
+                 "nabór wniosków dla woj. lubelskiego i mazowieckiego planowany jest na styczeń 2027 r."])
+    k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start is None and k.dane.data_startu is None
+    assert k.dane.zapowiedz.startswith("na styczeń 2027")
+    assert k.dane.wojewodztwa == ["lubelskie", "mazowieckie"]
+
+
+def test_zapowiedz_z_dokladna_data_po_wzmiance_o_minionym_naborze_to_pilne_z_ta_data():
+    z = _zmiana(["W związku z zakończeniem naboru przeprowadzonego w dniu 29.09.2026 r. informujemy, że kolejny "
+                 "nabór wniosków dla woj. lubelskiego i mazowieckiego planowany jest na 15 stycznia 2027 r."])
+    k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start == w_warszawie(2027, 1, 15, 8, 0)
+    assert k.dane.pewna_data is False  # data bez „od dnia” – alert każe ją sprawdzić
+
+
+def test_ogloszenie_z_przypomnieniem_o_minionym_naborze_bierze_przyszla_date():
+    z = _zmiana(["IV NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie",
+                 "Przypominamy, że w dniu 29.09.2026 r. zakończył się III nabór. Wnioski przyjmowane będą "
+                 "w dniu 15 stycznia 2027 r. od godz. 8:30.",
+                 "Kwota do dyspozycji w ramach naboru - 2 000 000,00 zł"])
+    k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start == w_warszawie(2027, 1, 15, 8, 30)
+    assert k.dane.kwoty == [Decimal("2000000.00")]
+
+
+def test_od_dnia_o_czyms_innym_nie_przeslania_rozpoczecia_naboru():
+    z = _zmiana(["Od dnia 1 października 2026 r. biuro w Radomiu ma nowy adres.",
+                 "Rozpoczęcie naboru – 15.01.2027 godz. 8:30"])
+    k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start == w_warszawie(2027, 1, 15, 8, 30)
+
+
+def test_szablon_lfr_wygrywa_z_innym_przyszlym_od_dnia():
+    tekst = _n("Od dnia 1 listopada 2026 r. obowiązuje nowy regulamin. Informujemy, że od dnia 15 stycznia "
+               "2027 r. (od godz. 8:30) Lubelska Fundacja Rozwoju przyjmować będzie wnioski")
+    odn = Odniesienie(TERAZ, WAW, GODZ_8)
+    assert wyciagnij_start(tekst, 2026, odn) == (date(2027, 1, 15), time(8, 30), True)
+
+
+def test_godzina_nie_jest_pozyczana_od_innej_daty():
+    """Godzina „8:30” stoi przy 15.01.2027 – nie może trafić do minionego 29.09.2026."""
+    tekst = _n("w dniu 29.09.2026 r. zakończył się III nabór. Wnioski przyjmowane będą w dniu "
+               "15 stycznia 2027 r. od godz. 8:30.")
+    assert wyciagnij_start(tekst, 2026) == (date(2026, 9, 29), None, True)  # bez odniesienia: pierwsza data
+
+
+def test_wylacznie_przeszle_daty_i_przeszla_zapowiedz_to_nadal_info():
+    z = _zmiana(["II NABÓR WNIOSKÓW O POŻYCZKĘ - rozpoczęcie naboru w dniu 20 kwietnia 2026 r.; "
+                 "kolejny nabór planowany jest na czerwiec 2026 r."])
+    k = klasyfikuj(z, TERAZ, WAW, GODZ_8)
+    assert k.poziom == INFO and "już się odbył" in k.powod
+
+
+@pytest.mark.parametrize("zapowiedz, aktualna", [
+    ("na styczeń 2027 r.", True),
+    ("na październik 2026 r.", True),  # bieżący miesiąc
+    ("na czerwiec 2026 r.", False),
+    ("na 15 stycznia 2027 r.", True),
+    ("na 5 października 2026 r.", False),  # dokładna data sprzed ponad doby
+    ("na 2025 r.", False),
+    ("na wiosnę", True),  # bez roku – lepiej powiadomić
+])
+def test_zapowiedz_aktualna(zapowiedz, aktualna):
+    assert zapowiedz_aktualna(_n(zapowiedz), Odniesienie(TERAZ, WAW, GODZ_8)) is aktualna
+
+
+# Wada 4: data bez roku ogłoszona w grudniu na styczeń dostawała bieżący rok -> „już się odbył”.
+
+def test_grudniowe_ogloszenie_na_styczen_bez_roku_to_nastepny_rok():
+    z = _zmiana(["IV NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie",
+                 "Informujemy, że od dnia 15 stycznia (od godz. 8:30) Lubelska Fundacja Rozwoju "
+                 "przyjmować będzie wnioski"])
+    k = klasyfikuj(z, w_warszawie(2026, 12, 10, 12, 0), WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start == w_warszawie(2027, 1, 15, 8, 30)
+
+
+@pytest.mark.parametrize("teraz, tekst, data", [
+    # wzmianka o minionym naborze bez roku zostaje w bieżącym roku
+    (w_warszawie(2026, 10, 23, 12, 0), "w ramach naboru przeprowadzonego w dniu 16 czerwca", date(2026, 6, 16)),
+    # styczeń o grudniu bez roku = poprzedni rok
+    (w_warszawie(2027, 1, 10, 12, 0), "od dnia 15 grudnia (od godz. 8:30)", date(2026, 12, 15)),
+    # „br.” = zawsze bieżący rok
+    (w_warszawie(2026, 12, 10, 12, 0), "od dnia 15 stycznia br. (od godz. 8:30)", date(2026, 1, 15)),
+])
+def test_rok_daty_bez_roku_najblizszy_dzis(teraz, tekst, data):
+    d, _, _ = wyciagnij_start(_n(tekst), teraz.year, Odniesienie(teraz, WAW, GODZ_8))
+    assert d == data
+
+
+# Wada 5: zmiana miesiąca w istniejącej zapowiedzi („na maj” -> „na czerwiec”) dawała tylko INFO.
+
+ZAPOWIEDZ_MAJ = "Uprzejmie informujemy, że kolejny nabór wniosków o pożyczkę planowany jest na maj 2026 r."
+MARZEC_2026 = w_warszawie(2026, 3, 10, 12, 0)
+
+
+def test_zmiana_miesiaca_w_zapowiedzi_to_pilne():
+    z = _zmiana([ZAPOWIEDZ_MAJ.replace("na maj", "na czerwiec")], [ZAPOWIEDZ_MAJ])
+    k = klasyfikuj(z, MARZEC_2026, WAW, GODZ_8)
+    assert k.poziom == PILNE, k.powod
+    assert k.start is None and k.dane.zapowiedz.startswith("na czerwiec 2026")
+    assert k.poprzednia_zapowiedz.startswith("na maj 2026")
+    msg = alert_pilny(k, z, url="https://example.invalid/", moje=["lubelskie"], strefa=WAW, teraz=MARZEC_2026,
+                      przypomnienia=[], powod_braku_przypomnien="brak")
+    assert "UWAGA: ZMIANA PLANOWANEGO TERMINU (poprzednio: na maj 2026" in msg
+    assert "Planowany termin: na czerwiec 2026" in msg
+
+
+@pytest.mark.parametrize("nowa", [
+    ZAPOWIEDZ_MAJ + " Zapraszamy!",  # dopisek po kropce
+    ZAPOWIEDZ_MAJ.replace(" r.", "."),  # bez „r.”
+    ZAPOWIEDZ_MAJ.replace("na maj", "na MAJ"),  # wielkość liter
+])
+def test_kosmetyka_zapowiedzi_bez_zmiany_terminu_to_info(nowa):
+    z = _zmiana([nowa], [ZAPOWIEDZ_MAJ])
+    assert klasyfikuj(z, MARZEC_2026, WAW, GODZ_8).poziom == INFO
+
+
+def test_poprawka_przeszlej_zapowiedzi_to_info():
+    """Literówka poprawiona w zapowiedzi sprzed pół roku to nie nowy nabór."""
+    stara = "kolejny nabór wniosków planowany jest na kwiecien 2026 r."
+    z = _zmiana([stara.replace("kwiecien 2026", "maj 2026")], [stara])
+    assert klasyfikuj(z, TERAZ, WAW, GODZ_8).poziom == INFO
