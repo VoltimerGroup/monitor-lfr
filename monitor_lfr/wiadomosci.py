@@ -19,7 +19,10 @@ TYTUL_INFO = "[INFO] Zmiana na stronie – Pierwszy biznes (LFR)"
 TYTUL_AWARIA = "[AWARIA] Monitor nie może odczytać strony LFR"
 TYTUL_POWROT = "[OK] Monitor znowu działa"
 TYTUL_HEARTBEAT = "[HEARTBEAT] Monitor LFR działa"
-TYTUL_PODGLAD = "🔎 PODGLĄD — aktualna treść strony (to NIE jest zmiana ani nowy nabór)"
+# Nagłówek mówi o WIADOMOŚCI (nie sygnalizuje zmiany), a nie o stronie – czy na stronie jest
+# aktualny nabór, mówi dopiero linia UWAGA pod nim (_uwaga_aktualny_nabor).
+TYTUL_PODGLAD = "🔎 PODGLĄD — aktualna treść strony (to NIE jest powiadomienie o zmianie)"
+PRZYPOMNIENIA_PODGLADU = "podgląd ich nie planuje ani nie zmienia (planuje je zwykły alert PILNY)"
 
 MAKS_FRAGMENTU = 500
 MAKS_POZYCJI_INFO = 8
@@ -263,6 +266,25 @@ def _dane_klasyfikacji(k: Klasyfikacja, moje: list[str], strefa: ZoneInfo) -> li
     return linie
 
 
+def _uwaga_aktualny_nabor(k: Klasyfikacja, strefa: ZoneInfo, teraz: datetime) -> str:
+    """Druga linia podglądu, gdy najnowszy wpis jest PILNY – widać ją w powiadomieniu tuż pod nagłówkiem.
+
+    PILNE znaczy: start nie minął dawniej niż PROG_HISTORYCZNY temu albo go nie odczytano
+    (wtedy pokazujemy planowany termin, jeśli jest).
+    """
+    d = k.dane
+    if k.start is not None:
+        kiedy = "start " + (f"{k.start.astimezone(strefa):%d.%m.%Y}" if d and d.godzina_startu is None
+                            else format_daty(k.start, strefa))
+        if k.start <= teraz:
+            kiedy += " – JUŻ TRWA lub minął"
+    elif d and d.zapowiedz:
+        kiedy = f"planowany termin: {_przytnij(d.zapowiedz, 60)}"
+    else:
+        kiedy = "daty startu nie odczytano"
+    return f"UWAGA: najnowszy wpis wygląda na AKTUALNY nabór ({kiedy}) – sprawdź stronę i zwykłe alerty."
+
+
 def podglad_strony(
     wpisy: list[tuple[Zmiana, Klasyfikacja]],
     *,
@@ -281,8 +303,10 @@ def podglad_strony(
     i adres) zostaje zawsze – przy limicie Telegrama najpierw ubywa listy starszych wpisów.
     """
     z, k = wpisy[0]
-    glowna = [
-        TYTUL_PODGLAD,
+    glowna = [TYTUL_PODGLAD]
+    if k.poziom == PILNE:
+        glowna.append(_uwaga_aktualny_nabor(k, strefa, teraz))
+    glowna += [
         "Najnowszy wpis ze strony – tak wyglądałby alert, gdyby ten wpis właśnie się pojawił.",
         "Monitor nic nie zapisał ani nie zaplanował (stan bez zmian).",
         "",
@@ -290,7 +314,7 @@ def podglad_strony(
     ]
     if k.poziom == PILNE:
         glowna.append(alert_pilny(k, z, url=url, moje=moje, strefa=strefa, teraz=teraz, przypomnienia=[],
-                                  powod_braku_przypomnien="podgląd ich nie planuje"))
+                                  powod_braku_przypomnien=PRZYPOMNIENIA_PODGLADU))
     else:
         glowna.append(alert_info([(z, k)], url=url, strefa=strefa))
     glowna += ["----- koniec przykładu -----", "", f"Klasyfikacja wpisu: {k.poziom} – {k.powod}",

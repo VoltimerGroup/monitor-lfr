@@ -234,9 +234,14 @@ alertu)?
 
 Na Telegram przyjdzie JEDNA wiadomość:
 
-- pierwsza linia: `🔎 PODGLĄD — aktualna treść strony (to NIE jest zmiana ani nowy nabór)`,
+- pierwsza linia: `🔎 PODGLĄD — aktualna treść strony (to NIE jest powiadomienie o zmianie)` –
+  mówi o samej wiadomości, a nie o stronie,
+- gdy najnowszy wpis klasyfikuje się jako PILNE, zaraz pod nią (widać to w powiadomieniu):
+  `UWAGA: najnowszy wpis wygląda na AKTUALNY nabór (start …) – sprawdź stronę i zwykłe alerty.`
+  (zamiast startu: planowany termin albo „daty startu nie odczytano”),
 - najnowszy wpis ze strony sformatowany dokładnie tak, jak w prawdziwym alercie (PILNE albo INFO –
-  według zwykłej klasyfikacji; jedyna różnica: przypomnienia nie są planowane),
+  według zwykłej klasyfikacji; jedyna różnica: linia „Przypomnienia: podgląd ich nie planuje ani
+  nie zmienia (planuje je zwykły alert PILNY)”),
 - co odczytała klasyfikacja (poziom, dopasowane wzorce; przy INFO także województwa z oznaczeniem
   „dotyczy Twoich województw”, numer, start, pula – tylko to, co faktycznie odczytano),
 - odnośniki w treści i liczba plików w „Dokumenty do pobrania”,
@@ -375,7 +380,7 @@ tworzy nowy monitor czytający stan z dysku – jak restart w Actions. Pokrywaj�
 | przeszła data obok przyszłej, data bez roku w grudniu, zmiana zapowiedzi | `tests/test_klasyfikacja.py` (sekcja „poprawki po recenzji”) |
 | workflow: checkout czubka gałęzi, commit stanu po równoległym commicie (prawdziwy git) | `tests/test_workflow.py` |
 | workflow: które kroki ruszają przy cronie, teście alertu i podglądzie | `tests/test_workflow.py` |
-| `--podglad`: oznaczenie PODGLĄD, najnowszy wpis jak w prawdziwym alercie, stan bajt w bajt bez zmian, błąd pobrania = kod 1 i zero wiadomości | `tests/test_podglad.py` |
+| `--podglad`: oznaczenie PODGLĄD, ostrzeżenie UWAGA przy wpisie PILNYM, najnowszy wpis jak w prawdziwym alercie, stan bajt w bajt bez zmian, błąd pobrania = kod 1 i zero wiadomości | `tests/test_podglad.py` |
 
 Aktualizacja kopii strony: pobierz stronę do nowego pliku w `tests/fixtures/` i podmień nazwę
 w `tests/conftest.py` (`PLIK_STRONY`).

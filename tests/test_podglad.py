@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import BLOK_IV, PLIK_STRONY, T0, URL, AtrapaKanalu, Srodowisko, dopisz_na_gorze
+from conftest import BLOK_IV, PLIK_STRONY, T0, URL, AtrapaKanalu, Srodowisko, dopisz_na_gorze, w_warszawie
 from monitor_lfr import cli
 from monitor_lfr import stan as modul_stanu
 from monitor_lfr.cli import main
@@ -22,7 +22,12 @@ from monitor_lfr.pobieranie import BladPobierania, Odpowiedz
 from monitor_lfr.wiadomosci import TYTUL_INFO, TYTUL_PILNY
 
 # Dosłownie – test ma paść, gdy ktoś zmieni albo usunie oznaczenie (także w stałej).
-PIERWSZA_LINIA = "🔎 PODGLĄD — aktualna treść strony (to NIE jest zmiana ani nowy nabór)"
+# Nagłówek mówi o wiadomości, nie o stronie – nie może twierdzić, że naboru nie ma.
+PIERWSZA_LINIA = "🔎 PODGLĄD — aktualna treść strony (to NIE jest powiadomienie o zmianie)"
+DRUGA_LINIA_INFO = "Najnowszy wpis ze strony – tak wyglądałby alert, gdyby ten wpis właśnie się pojawił."
+UWAGA_IV = ("UWAGA: najnowszy wpis wygląda na AKTUALNY nabór (start piątek 15.01.2027, godz. 8:30) "
+            "– sprawdź stronę i zwykłe alerty.")
+PRZYPOMNIENIA = "Przypomnienia: podgląd ich nie planuje ani nie zmienia (planuje je zwykły alert PILNY)"
 NAJNOWSZY_WPIS_23_10 = ("Informujemy, że po przeprowadzeniu ponownej, szczegółowej weryfikacji terminów "
                         "wpływu wniosków na serwer pocztowy LFR")
 TYTUL_STRONY = "Pierwszy Biznes - Wsparcie w Starcie - nabory od 2026"
@@ -33,6 +38,10 @@ BLOK_KOMUNIKAT = """
 <p>Informujemy, że biuro Fundacji w Lublinie będzie nieczynne w dniu 2 listopada 2026 r.</p>
 <p>&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;</p>
 """
+# Fikcyjne wpisy PILNE bez przyszłej daty startu (zapowiedź, sam nagłówek naboru).
+BLOK_ZAPOWIEDZ = ("<p>Uprzejmie informujemy, że kolejny nabór wniosków o pożyczkę w ramach Instrumentu "
+                  "Finansowego Pierwszy Biznes – Wsparcie w Starcie planowany jest na styczeń 2027 r.</p><p>……………</p>")
+BLOK_BEZ_DATY = "<p><strong>IV NABÓR WNIOSKÓW O POŻYCZKĘ</strong></p><p>Szczegóły wkrótce.</p><p>……………</p>"
 
 
 def _konfig_plik(tmp_path: Path) -> str:
@@ -58,7 +67,10 @@ def _przyklad_alertu(wiadomosc: str) -> str:
 def test_wiadomosc_zaczyna_sie_od_oznaczenia_podgladu(html_dzis):
     kod, wyslane = _podglad(html_dzis)
     assert kod == 0 and len(wyslane) == 1
-    assert wyslane[0].splitlines()[0] == PIERWSZA_LINIA
+    linie = wyslane[0].splitlines()
+    assert linie[0] == PIERWSZA_LINIA
+    # Najnowszy wpis to INFO – bez ostrzeżenia o aktualnym naborze.
+    assert linie[1] == DRUGA_LINIA_INFO and "UWAGA: najnowszy wpis" not in wyslane[0]
 
 
 def test_zawiera_najnowszy_wpis_a_nie_naglowek_strony(html_dzis):
@@ -89,16 +101,32 @@ def test_lista_starszych_wpisow_z_data_startu_i_stopka(html_dzis):
 
 def test_nowy_nabor_na_gorze_wyglada_jak_prawdziwy_alert_pilny(html_z_iv):
     _, (wiadomosc,) = _podglad(html_z_iv)
+    linie = wiadomosc.splitlines()
+    # To, co widać w powiadomieniu: nagłówek nie zaprzecza naborowi, a linia pod nim go zapowiada.
+    assert linie[0] == PIERWSZA_LINIA and "nabór" not in linie[0].casefold()
+    assert linie[1] == UWAGA_IV and linie[2] == DRUGA_LINIA_INFO
     przyklad = _przyklad_alertu(wiadomosc)
     assert przyklad.startswith(TYTUL_PILNY)
     assert "\nIV NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie\n" in przyklad
     assert ">>> DOTYCZY TWOICH WOJEWÓDZTW: lubelskie, mazowieckie <<<" in przyklad
     assert "Start: piątek 15.01.2027, godz. 8:30" in przyklad and "Pula: 2 000 000,00 zł" in przyklad
-    # Podgląd niczego nie planuje i mówi to wprost.
-    assert "Przypomnienia: podgląd ich nie planuje" in przyklad
+    # Podgląd niczego nie planuje i mówi to wprost – bez sugestii, że przypomnień nie będzie wcale.
+    assert f"\n{PRZYPOMNIENIA}\n" in przyklad
     assert "Klasyfikacja wpisu: PILNE – nowe ogłoszenie" in wiadomosc
     # Wcześniejszy „najnowszy” wpis przesunął się na listę starszych.
     assert "Starsze wpisy na stronie:\n• " + NAJNOWSZY_WPIS_23_10[:60] in wiadomosc
+
+
+@pytest.mark.parametrize("blok, teraz, w_nawiasie", [
+    (BLOK_IV, w_warszawie(2027, 1, 15, 9, 0), "start piątek 15.01.2027, godz. 8:30 – JUŻ TRWA lub minął"),
+    (BLOK_ZAPOWIEDZ, T0, "planowany termin: na styczeń 2027 r"),
+    (BLOK_BEZ_DATY, T0, "daty startu nie odczytano"),
+], ids=["start-minal-przed-chwila", "zapowiedz", "bez-daty"])
+def test_ostrzezenie_o_aktualnym_naborze_przy_kazdym_wpisie_pilnym(html_dzis, blok, teraz, w_nawiasie):
+    _, (wiadomosc,) = _podglad(dopisz_na_gorze(html_dzis, blok), teraz)
+    assert _przyklad_alertu(wiadomosc).startswith(TYTUL_PILNY)
+    assert wiadomosc.splitlines()[:2] == [
+        PIERWSZA_LINIA, f"UWAGA: najnowszy wpis wygląda na AKTUALNY nabór ({w_nawiasie}) – sprawdź stronę i zwykłe alerty."]
 
 
 @pytest.mark.parametrize("blok, tytul", [(BLOK_IV, TYTUL_PILNY), (BLOK_KOMUNIKAT, TYTUL_INFO)])
