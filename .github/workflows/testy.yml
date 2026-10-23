@@ -1,0 +1,33 @@
+name: Testy
+
+# Testy (pytest) po każdej zmianie kodu. Bez sieci i bez Telegrama.
+# Commity stanu robione przez bota (GITHUB_TOKEN) NIE uruchamiają tego workflow.
+
+on:
+  push:
+    paths:
+      - "monitor_lfr/**"
+      - "tests/**"
+      - "requirements*.txt"
+      - "config.json"
+      - "pytest.ini"
+      - ".github/workflows/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - run: python -m pytest -q

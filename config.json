@@ -1,0 +1,36 @@
+{
+  "_komentarz": "Konfiguracja monitora. Opis pól: README.md, sekcja „Konfiguracja”. Sekretów (token, chat_id) NIE wpisuj tutaj.",
+  "url": "https://www.lfr.lublin.pl/projekty/pierwszy-biznes-wsparcie-w-starcie-2025/",
+  "moje_wojewodztwa": ["mazowieckie", "lubelskie"],
+  "strefa_czasowa": "Europe/Warsaw",
+  "kanal": "telegram",
+  "heartbeat": {
+    "wlaczony": true,
+    "godzina": 9
+  },
+  "przypomnienia": {
+    "przed_startem": ["3d", "1d", "1h"],
+    "tylko_moje_wojewodztwa": true,
+    "godzina_startu_gdy_brak": "08:00"
+  },
+  "awaria": {
+    "kolejne_bledy_do_alertu": 3
+  },
+  "pobieranie": {
+    "timeout_s": 30,
+    "ponowienia": 3,
+    "backoff_s": 5
+  },
+  "ekstrakcja": {
+    "selektory_tresci": [
+      "div.institution.entry > div.area > div.text",
+      "div.entry > div.area > div.text"
+    ],
+    "selektor_dokumentow": "#dokumenty-do-pobrania",
+    "oczekiwane_frazy": ["Pierwszy Biznes"],
+    "min_linii": 10
+  },
+  "log": {
+    "max_wpisow": 2000
+  }
+}

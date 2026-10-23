@@ -1,0 +1,355 @@
+{
+ "wersja_schematu": 1,
+ "wersja_normalizacji": 1,
+ "strona": {
+  "hash": "2787433f55bddf443a14fa50d5fad4e751cd82ac99f7ffc5bcbcdb1362e82b55",
+  "od": "2026-10-23T20:04:15+00:00",
+  "tresc": {
+   "linie": [
+    "15.12.2025",
+    "Pierwszy Biznes - Wsparcie w Starcie - nabory od 2026",
+    "Informujemy, że po przeprowadzeniu ponownej, szczegółowej weryfikacji terminów wpływu wniosków na serwer pocztowy LFR publikujemy zweryfikowaną Listę wniosków złożonych w naborze z dnia 29.09.2026 r. (od godz. 8:30) w ramach Instrumentu finansowego \"Pierwszy biznes - Wsparcie w starcie\" w województwach lubelskim, mazowieckim i podlaskim.",
+    "Dziękujemy za cierpliwość i wyrozumiałość.",
+    "Z uwagi na wartość złożonych wniosków przekraczającą dostępną alokację, do oceny zostaną skierowane wnioski uznane jako podlegające rejestracji o łącznej wartości dofinansowania na poziomie 150% budżetu naboru tj. do wniosku 55 włącznie.",
+    "Objęcie wniosku oceną nie oznacza gwarancji uzyskania dofinansowania. Przyznanie dofinansowania będzie uzależnione od wyników oceny oraz dostępności środków finansowych.",
+    "Kolejne wnioski z listy uznane jako podlegające rejestracji (dotyczy wniosków od nr 56) zostaną skierowane do oceny WYŁĄCZNIE W PRZYPADKU DOSTĘPNOŚCI ŚRODKÓW, po zakończeniu oceny wniosków objętych pierwszą pulą.",
+    "Skorygowana lista wniosków",
+    "Dodatkowe wyjaśnienia dotyczące przyczyny i sposobu ustalenia godzin wpływu wniosków w ramach naboru z dnia 29.09.2026 r.",
+    "1.Przyczyna nieprawidłowości w pierwotnym zestawieniu",
+    "W pierwotnie opublikowanej liście wniosków (publikacja z dnia 9.10.2026 r.) w przypadku wniosków składanych elektronicznie z powodu błędu pracownika w zestawieniu zamieszczono godziny wysłania wiadomości e-mail przez wnioskodawców, zamiast godzin faktycznego wpływu tych wiadomości na serwer pocztowy LFR (zgodnie z zasadami przyjętymi dla naboru). W konsekwencji pierwotne zestawienie zawierało nieprawidłowe dane dotyczące godzin wpływu wniosków składanych elektronicznie. Nieprawidłowość została zidentyfikowana po zgłoszeniu przez wnioskodawców wątpliwości dotyczących opublikowanych informacji.",
+    "2. Weryfikacja danych i ustalenie prawidłowych godzin wpływu",
+    "W odpowiedzi na zgłoszone zastrzeżenia przeprowadzono ponowną weryfikację danych.",
+    "W tym celu zwrócono się do administratora serwera pocztowego o ustalenie rzeczywistych godzin wpływu poszczególnych wiadomości zawierających wnioski.",
+    "Jak wynika z wyjaśnień administratora, godziny te ustalono na podstawie nagłówków wiadomości e-mail, w szczególności pola \"Received\", wskazującego moment przyjęcia wiadomości przez serwer pocztowy LFR (cerber.lfr.lublin.pl).",
+    "Administrator potwierdził również, że zegar serwera jest zsynchronizowany z serwerami czasu. Wskazał ponadto, że czas wysłania wiadomości prezentowany w programie pocztowym nadawcy nie musi odpowiadać momentowi jej dostarczenia na serwer odbiorcy. Różnice mogą wynikać między innymi z kolejkowania wiadomości na serwerze nadawcy, wielkości przesyłanych załączników, ponawiania prób dostarczenia wiadomości lub ustawień programu pocztowego.",
+    "3. Korekta listy",
+    "Po uzyskaniu danych od administratora serwera sporządzono i opublikowano skorygowaną listę (16.10.2026 r.) zawierającą prawidłowe godziny wpływu wszystkich wniosków składanych elektronicznie ustalone na podstawie danych serwerowych. W ten sposób pierwotne zestawienie zostało zastąpione zestawieniem opartym na zweryfikowanych danych technicznych.",
+    "Wnioski oceniane będą w kolejności wpływu. Z uwagi na dużą ilość wniosków proces ich oceny może ulec wydłużeniu.",
+    ".....................................................................................................................................",
+    "Komunikat dotyczący usunięcia opublikowanej listy wniosków",
+    "Informujemy, że z uwagi na zgłoszone przez Wnioskodawców reklamacje opublikowana w dniu 9.10.2026 Lista wniosków złożonych w naborze z dnia 29.09.2026 r. (od godz. 8.30) w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie w woj. lubelskim, mazowieckim i podlaskim zostaje usunięta.",
+    "Decyzja ta wynika z konieczności przeprowadzenia ponownej, szczegółowej weryfikacji rzeczywistych terminów wpływu wniosków na serwer pocztowy LFR.",
+    "Dbając o pełną transparentność procesu naboru oraz równe traktowanie wszystkich wnioskodawców konieczne jest potwierdzenie, że kolejność zgłoszeń oraz daty ich doręczenia zostały zarejestrowane bezbłędnie.",
+    "Nowa, zweryfikowana lista zostanie opublikowana niezwłocznie po zakończeniu prac technicznych. Przepraszamy za wszelkie niedogodności.",
+    "Niniejsza informacja została również przekazana do Departamentu Programów Europejskich Banku Gospodarstwa Krajowego.",
+    "..............................................................................................................................................................................................................",
+    "III NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie, podlaskie",
+    "Lista wniosków złożonych w ramach naboru z dnia 29.09.2026 r. - Pierwszy biznes - Wsparcie w starcie w woj. lubelskim, mazowieckim i podlaskim",
+    "Lubelska Fundacja Rozwoju publikuje listę wniosków złożonych w ramach naboru wniosków o niskooprocentowaną pożyczkę na podjęcie działalności gospodarczej w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie",
+    "Rozpoczęcie naboru - 29.09.2026 godz. 8:30",
+    "Wstrzymanie naboru - 29.09.2026 godz. 09:20",
+    "Kwota do dyspozycji w ramach naboru - 4 166 250,00 zł",
+    "Wyjaśnienia dotyczące wniosków składanych w formie elektronicznej:",
+    "Rejestracji podlegają wyłącznie wnioski przesłane na adres lfr@lfr.lublin.pl od momentu rozpoczęcia naboru wniosków, tj. od godz. 8:30 w dniu 29 września 2026 do momentu jego wstrzymania",
+    "aby zostało uznane, że wniosek został przesłany, pliki wniosku musiały znaleźć się na serwerze obsługującym w/w adres poczty LFR, tj. pliki wniosku zostały załączone do maila;",
+    "moment złożenia wniosku oznacza czas, w którym mail został otrzymany przez serwer LFR;",
+    "w przypadku przesłania kilku maili z tożsamymi plikami wniosku na liście złożonych wniosków umieszczony został pierwszy z przesłanych wniosków; jeżeli w trakcie oceny wniosków zostało stwierdzone, że kilka przesłanych wniosków zawierających różne pliki prezentuje informacje dotyczące tego samego wniosku (tożsama kwota, miejsce realizacji i zakres przedsięwzięcia), ocenie podlega pierwszy z przesłanych wniosków, zaś pozostałe nie będą rozpatrywane.",
+    "Wnioski rejestrowane są naprzemiennie (jeden wniosek złożony osobiście w oddziale - jeden złożony w formie elektronicznej mailem - itd.) - według kolejności złożenia wniosku w danej formie.",
+    "Identyfikacja wniosku na liście następuje na podstawie godziny złożenia, imienia Wnioskodawcy i kwoty wnioskowanej pożyczki.",
+    "Informacje dotyczące wniosku:",
+    "wniosek podlega rejestracji",
+    "wniosek nie podlega rejestracji wraz z podaniem przyczyny niezarejestrowania wniosku",
+    "Z uwagi na wartość złożonych wniosków przekraczającą dostępną alokację, do oceny zostaną skierowane wnioski uznane jako podlegające rejestracji o łącznej wartości dofinansowania nieprzekraczającej 150% budżetu naboru tj. do wniosku 68 włącznie.",
+    "Objęcie wniosku oceną nie oznacza gwarancji uzyskania dofinansowania. Przyznanie dofinansowania będzie uzależnione od wyników oceny oraz dostępności środków finansowych.",
+    "Kolejne wnioski z listy uznane jako podlegające rejestracji (dotyczy wniosków od nr 69) zostaną skierowane do oceny WYŁĄCZNIE W PRZYPADKU DOSTĘPNOŚCI ŚRODKÓW, po zakończeniu oceny wniosków objętych pierwszą pulą.",
+    "Lista wniosków",
+    "Wnioski oceniane będą w kolejności wpływu. Z uwagi na dużą ilość wniosków proces ich oceny może ulec wydłużeniu.",
+    ".................................................................................................................................................................................................................................",
+    "III NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie, podlaskie",
+    "Informujemy, że od dnia 29 września 2026 r. (od godz. 8:30) Lubelska Fundacja Rozwoju przyjmować będzie wnioski o niskooprocentowaną pożyczkę na podjęcie działalności gospodarczej w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie",
+    "dla wnioskodawców planujących rozpoczęcie działalności gospodarczej w woj. lubelskim, mazowieckim i podlaskim (Umowa Operacyjna nr 2/WWS/1025/2025/IX/EFS/307) - kwota do dyspozycji w ramach naboru - 4 166 250,00 zł",
+    "Wnioski w formie papierowej można składać wyłącznie we wskazanych poniżej biurach Lubelskiej Fundacji Rozwoju:",
+    "Lubelska Fundacja Rozwoju o/Lublin, ul. Rynek 7, 20-111 Lublin, 81 528 53 35, 81 528 53 36, kom: 605 207 378, 609 770 825",
+    "Lubelska Fundacja Rozwoju o/Białystok, ul. Cieszyńska 3A, lok.522, 15-371 Białystok, tel. 85 650 62 60, kom: 500 062 246",
+    "Lubelska Fundacja Rozwoju o/Radom, ul. Wierzbicka 26/44 kl. I pok. 2, 26-606 Radom, tel. 22 288 53 50, kom: 607 830 247",
+    "Osoby zainteresowane pożyczką zobowiązane są do przedłożenia Wniosku o pożyczkę wraz z załącznikami",
+    "w formie papierowej wyłącznie we wskazanych powyżej biurach Fundacji",
+    "drogą pocztową (decyduje data i godzina wpływu korespondencji)",
+    "w wersji elektronicznej (decyduje data i godzina wpływu na serwer LFR) wyłącznie w przypadku, gdy wszystkie dokumenty wymagające podpisu zostaną opatrzone kwalifikowanym podpisem elektronicznym (lfr@lfr.lublin.pl); w temacie wiadomości należy wskazać imię i nazwisko Wnioskodawcy",
+    "W przypadku przesłania kilku maili dotyczących tego samego Wniosku (Wnioskodawca, przedsięwzięcie) na liście złożonych wniosków umieszczony zostanie pierwszy z przesłanych wniosków, pozostałe nie będą rozpatrywane. Analogiczna zasada będzie miała zastosowanie w przypadku złożenia wniosków dotyczących tego samego finansowania w formie papierowej.",
+    "Jedna osoba, Wnioskodawca lub pełnomocnik Wnioskodawcy, może złożyć wyłącznie jeden wniosek.",
+    "Ważne! Partner Finansujący zastrzega iż wymaganym minimalnym zabezpieczeniem transakcji jest weksel własny in blanco wnioskodawcy oraz poręczenie co najmniej jednej osoby fizycznej. Ostateczna forma zabezpieczenia zależy od oceny zdolności kredytowej pożyczkobiorcy i ryzyka kredytowego.",
+    "Partner Finansujący zastrzega sobie prawo do zamknięcia naboru w momencie, gdy wartość złożonych wniosków o pożyczkę przekroczy 150 % kwoty wskazanej powyżej.",
+    "Rejestracja wniosków złożonych osobiście oraz przesłanych drogą mailową będzie następowała naprzemiennie (jeden wniosek złożony osobiście w oddziale - jeden złożony w formie elektronicznej mailem - itd.) - według kolejności złożenia wniosku w danej formie. Wnioski złożone za pośrednictwem operatora pocztowego traktowane będą jak wnioski złożone osobiście.",
+    "Partner Finansujący zastrzega sobie prawo do odrzucenia wniosku (bez rejestracji i rozpatrzenia) gdy:",
+    "pola we wniosku są puste lub wypełnione częściowo,",
+    "dokumentacja nie zawiera podstawowych wymaganych załączników w tym dokumentu potwierdzającego status wnioskodawcy, nie załączono dokumentów poręczyciela itp.",
+    "dokumenty nie są podpisane,",
+    "w przypadku wniosku składanego w formie elektronicznej dokumenty nie są opatrzone kwalifikowanym podpisem elektronicznym (nie dopuszcza się podpisu poprzez profil zaufany)",
+    "wniosek i załączniki zostały złożone niezgodnie z zasadami naboru, np. dokumenty nie są zgodne z wzorami zamieszczonymi na stronie PF.",
+    "...............................................................................................................................................................................................................................................................................................",
+    "KOMUNIKAT:",
+    "W związku z bardzo dużą liczbą przyjętych wniosków (w tym drogą elektroniczną) w ramach naboru przeprowadzonego w dniu 16 czerwca br. , informujemy, że lista złożonych wniosków (umożliwiająca ich identyfikację na podstawie godziny złożenia, imienia Wnioskodawcy oraz kwoty wnioskowanej pożyczki) wraz z informacją, czy:",
+    "wniosek podlega rejestracji - będzie podlegał dalszej ocenie,",
+    "wniosek nie podlega rejestracji - nie będzie podlegał dalszej ocenie (wraz ze wskazaniem przyczyny niezarejestrowania wniosku),",
+    "zostanie opublikowana niezwłocznie po zakończeniu weryfikacji poprawności złożonej dokumentacji, ze szczególnym uwzględnieniem weryfikacji prawidłowości podpisów w przypadku wniosków złożonych drogą elektroniczną.",
+    "Dziękujemy za wyrozumiałość.",
+    "II NABÓR WNIOSKÓW O POŻYCZKĘ woj. małopolskie i podkarpackie - NABÓR ZAMKNIĘTY",
+    "Informujemy, że od dnia 16 czerwca 2026 r. (od godz. 8:30) Lubelska Fundacja Rozwoju przyjmować będzie wnioski o niskooprocentowaną pożyczkę na podjęcie działalności gospodarczej w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie dla wnioskodawców planujących rozpoczęcie działalności gospodarczej w woj. małopolskim i podkarpackim",
+    "Umowa Operacyjna nr 2/WWS/1025/2025/IV/EFS/323 - kwota do dyspozycji w ramach naboru 1 300 000,00 zł",
+    "Umowa Operacyjna nr 2/WWS/224/2024/IV/EFS/088/259 - kwota do dyspozycji w ramach naboru 300 000,00 zł",
+    "Wnioski w formie papierowej można składać wyłącznie we wskazanych poniżej biurach Lubelskiej Fundacji Rozwoju:",
+    "Lubelska Fundacja Rozwoju o/Kraków, 30-554 Kraków, ul. Zamknięta 10, tel. 12 311 73 28, kom: 603 086 868, 603 092 353",
+    "Lubelska Fundacja Rozwoju o/Rzeszów, 35-329 Rzeszów, Al. Krzyżanowskiego 6 a lok. 8, tel. 17 853 59 17, kom: 500 062 150, 500 062 168, 665 230 553",
+    "Osoby zainteresowane pożyczką zobowiązane są do przedłożenia Wniosku o pożyczkę wraz z załącznikami",
+    "w formie papierowej wyłącznie we wskazanych powyżej biurach Fundacji",
+    "drogą pocztową (decyduje data wpływu korespondencji)",
+    "w wersji elektronicznej (decyduje data wpływu na serwer LFR) wyłącznie w przypadku, gdy wszystkie dokumenty wymagające podpisu zostaną opatrzone kwalifikowanym podpisem elektronicznym (lfr@lfr.lublin.pl).",
+    "W przypadku przesłania kilku maili dotyczących tego samego Wniosku (Wnioskodawca, przedsięwzięcie) na liście złożonych wniosków umieszczony zostanie pierwszy z przesłanych wniosków, pozostałe nie będą rozpatrywane. Analogiczna zasada będzie miała zastosowanie w przypadku złożenia wniosków dotyczących tego samego finansowania w formie papierowej.",
+    "Jedna osoba, Wnioskodawca lub pełnomocnik Wnioskodawcy, może złożyć wyłącznie jeden wniosek.",
+    "Ważne! Partner Finansujący zastrzega iż wymaganym minimalnym zabezpieczeniem transakcji jest weksel własny in blanco wnioskodawcy oraz poręczenie co najmniej jednej osoby fizycznej. Ostateczna forma zabezpieczenia zależy od oceny zdolności kredytowej pożyczkobiorcy i ryzyka kredytowego.",
+    "Partner Finansujący zastrzega sobie prawo do zamknięcia naboru w momencie, gdy wartość złożonych wniosków o pożyczkę przekroczy 150 % kwot wskazanych powyżej.",
+    "Rejestracja wniosków złożonych osobiście oraz przesłanych drogą mailową będzie następowała naprzemiennie (jeden wniosek złożony osobiście w oddziale - jeden złożony w formie elektronicznej mailem - itd.) - według kolejności złożenia wniosku w danej formie. Wnioski złożone za pośrednictwem operatora pocztowego traktowane będą jak wnioski złożone osobiście.",
+    "Partner Finansujący zastrzega sobie prawo do odrzucenia wniosku (bez rejestracji i rozpatrzenia) gdy:",
+    "pola we wniosku są puste lub częściowo wypełnione,",
+    "dokumentacja nie zawiera podstawowych wymaganych załączników w tym dokumentu potwierdzającego status wnioskodawcy,",
+    "dokumenty nie są podpisane,",
+    "w przypadku wniosku składanego w formie elektronicznej dokumenty nie są opatrzone kwalifikowanym podpisem elektronicznym,",
+    "wniosek i załączniki zostały złożone niezgodnie z zasadami naboru, np. dokumenty nie są zgodne z wzorami zamieszczonymi na stronie PF, nie załączono dokumentów poręczyciela.",
+    "...............................................................................................................................................................................................................................................................................",
+    "II NABÓR WNIOSKÓW O POŻYCZKĘ woj. lubelskie, mazowieckie, podlaskie - NABÓR ZAMKNIĘTY",
+    "Informujemy, że od dnia 20 kwietnia 2026 r. (od godz. 8:30) Lubelska Fundacja Rozwoju przyjmować będzie wnioski o niskooprocentowaną pożyczkę na podjęcie działalności gospodarczej w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie",
+    "dla wnioskodawców planujących rozpoczęcie działalności gospodarczej w woj. lubelskim, mazowieckim i podlaskim (Umowa Operacyjna nr 2/WWS/1025/2025/IX/EFS/307) - kwota do dyspozycji w ramach naboru - 4 166 250,00 zł",
+    "Wnioski w formie papierowej można składać wyłącznie we wskazanych poniżej biurach Lubelskiej Fundacji Rozwoju:",
+    "Lubelska Fundacja Rozwoju o/Lublin, ul. Rynek 7, 20-111 Lublin, 81 528 53 35, 81 528 53 36, kom: 605 207 378, 609 770 825",
+    "Lubelska Fundacja Rozwoju o/Białystok, ul. Cieszyńska 3A, lok.522 , 15-371 Białystok, tel. 85 650 62 60, kom: 500 062 246",
+    "Lubelska Fundacja Rozwoju o/Radom, ul. Wierzbicka 26/44 kl. I pok. 2, 26-606 Radom, tel. 22 288 53 50, kom: 607 830 247",
+    "Osoby zainteresowane pożyczką zobowiązane są do przedłożenia Wniosku o pożyczkę wraz z załącznikami - w formie papierowej wyłącznie we wskazanych powyżej biurach Fundacji lub drogą pocztową (decyduje data wpływu korespondencji). Możliwe jest złożenie wniosku w wersji elektronicznej (decyduje data wpływu na serwer LFR) wyłącznie w przypadku, gdy wszystkie dokumenty wymagające podpisu zostaną opatrzone kwalifikowanym podpisem elektronicznym (lfr@lfr.lublin.pl).",
+    "Jedna osoba, Wnioskodawca lub pełnomocnik Wnioskodawcy, może złożyć wyłącznie jeden wniosek.",
+    "W przypadku przesłania kilku maili dotyczących tego samego Wniosku (Wnioskodawca, przedsięwzięcie) na liście złożonych wniosków umieszczony zostanie pierwszy z przesłanych wniosków, pozostałe nie będą rozpatrywane. Analogiczna zasada będzie miała zastosowanie w przypadku złożenia wniosków dotyczących tego samego finansowania w formie papierowej oraz elektronicznej.",
+    "Wnioski o pożyczkę składane są u partnerów finansujących działających na obszarze regionu/makroregionu, w którym wykonywana będzie działalność gospodarcza.",
+    "Partner Finansujący zastrzega sobie prawo do zamknięcia naboru w momencie, gdy wartość złożonych wniosków o pożyczkę przekroczy 120 % kwot wskazanych powyżej.",
+    "Partner Finansujący zastrzega sobie prawo do odrzucenia wniosku (bez rejestracji i rozpatrzenia) gdy:",
+    "są puste lub częściowo wypełnione,",
+    "nie zawierają podstawowych wymaganych załączników w tym dokumentu potwierdzającego status wnioskodawcy",
+    "nie zawierają wymaganych podpisów,",
+    "w przypadku wniosku składanego w formie elektronicznej - nie są opatrzone kwalifikowanym podpisem elektronicznym,",
+    "zostały złożone niezgodnie z zasadami naboru.",
+    ".........................................................................................................................................................................................................................................................",
+    "Uprzejmie informujemy, że kolejny nabór wniosków o pożyczkę w ramach Instrumentu Finansowego Pierwszy Biznes - Wsparcie w Starcie planowany jest na maj 2026 r. - termin ZMIENIONY NA 20 kwietnia 2026 r.",
+    "Zastrzegamy, iż wskazany termin może ulec zmianie. Informacja o ewentualnej zmianie terminu/dokładnej dacie przyjmowania wniosków zostanie przekazana z odpowiednim wyprzedzeniem.",
+    "...............................................................................................................................................................................................................................................",
+    "I NABÓR WNIOSKÓW O POŻYCZKĘ - woj. podkarpackie, małopolskie, lubelskie, mazowieckie, podlaskie",
+    "Informujemy, że od dnia 8 stycznia 2026 r. (od godz. 8.00) Lubelska Fundacja Rozwoju przyjmować będzie wnioski o niskooprocentowaną pożyczkę na podjęcie działalności gospodarczej w ramach Instrumentu finansowego Pierwszy biznes - Wsparcie w starcie - NABÓR ZAMKNIĘTY",
+    "w woj. podkarpackim i małopolskim (Umowa Operacyjna nr 2/WWS/1025/2025/IV/EFS/323) - kwota do dyspozycji w ramach naboru - 2 220 000,00 zł",
+    "Wnioski w formie papierowej można składać wyłącznie we wskazanych poniżej biurach Lubelskiej Fundacji Rozwoju:",
+    "Lubelska Fundacja Rozwoju o/Kraków, 30-554 Kraków, ul. Zamknięta 10, tel. 12 311 73 28, kom: 603 086 868, 603 092 353",
+    "Lubelska Fundacja Rozwoju o/Rzeszów, 35-329 Rzeszów, Al. Krzyżanowskiego 6 a lok. 8, tel. 17 853 59 17, kom: 500 062 150, 500 062 168, 665 230 553",
+    "w woj. lubelskim, mazowieckim i podlaskim (Umowa Operacyjna nr 2/WWS/1025/2025/IX/EFS/307) - kwota do dyspozycji w ramach naboru - 4 162 500,00 zł",
+    "Wnioski w formie papierowej można składać wyłącznie we wskazanych poniżej biurach Lubelskiej Fundacji Rozwoju:",
+    "Lubelska Fundacja Rozwoju o/Lublin, ul. Rynek 7, 20-111 Lublin, 81 528 53 35, 81 528 53 36, kom: 605 207 378, 609 770 825",
+    "Lubelska Fundacja Rozwoju o/Białystok, ul. Cieszyńska 3A, lok.522 , 15-371 Białystok, tel. 85 650 62 60, kom: 500 062 246",
+    "Lubelska Fundacja Rozwoju o/Radom, ul. Wierzbicka 26/44 kl. I pok. 2, 26-606 Radom,tel. 22 288 53 50, kom: 607 830 247",
+    "Lubelska Fundacja Rozwoju o/Biała Podlaska, ul. Piłsudskiego 13/11, 21-500 Biała Podlaska, tel. 83 344 06 50, kom: 607 330580",
+    "Lubelska Fundacja Rozwoju o/Zamość, ul. Odrodzenia 7, 22-400 Zamość, tel. 84 639 08 60, kom: 665 103 015",
+    "Osoby zainteresowane pożyczką zobowiązane są do przedłożenia Wniosku o pożyczkę wraz z załącznikami - w formie papierowej wyłącznie we wskazanych powyżej biurach Fundacji lub drogą pocztową (decyduje data wpływu korespondencji). Możliwe jest złożenie wniosku w wersji elektronicznej (decyduje data wpływu na serwer lfr) wyłącznie w przypadku, gdy wszystkie dokumenty wymagające podpisu zostaną opatrzone kwalifikowanym podpisem elektronicznym (lfr@lfr.lublin.pl).",
+    "Jedna osoba, Wnioskodawca lub pełnomocnik Wnioskodawcy, może złożyć wyłącznie jeden wniosek.",
+    "W przypadku przesłania kilku maili dotyczących tego samego Wniosku (Wnioskodawca, przedsięwzięcie) na liście złożonych wniosków umieszczony zostanie pierwszy z przesłanych wniosków, pozostałe nie będą rozpatrywane. Analogiczna zasada będzie miała zastosowanie w przypadku złożenia wniosków dotyczących tego samego finansowania w formie papierowej oraz elektronicznej.",
+    "Wnioski o pożyczkę składane są u partnerów finansujących działających na obszarze regionu/makroregionu, w którym wykonywana będzie działalność gospodarcza.",
+    "Partner Finansujący zastrzega sobie prawo do zamknięcia naboru w momencie, gdy wartość złożonych wniosków o pożyczkę przekroczy 120 % kwot wskazanych powyżej.",
+    "........................................................................................................................................................................................................................................................",
+    "Pożyczka na podjęcie działalności gospodarczej oraz świadczenia usług doradztwa i szkoleń w ramach \"Rządowego Programu Pierwszy biznes - Wsparcie w starcie\" oraz \"Programu Fundusze Europejskie dla Rozwoju Społecznego na lata 2021-2027 (FERS)\" finansowanych ze środków Europejskiego Funduszu Społecznego Plus w okresie programowania 2021-2027 oraz Funduszu Pracy.",
+    "Województwo małopolskie i podkarpackie",
+    "Informacje ogólne",
+    "Instrument Finansowy Pierwszy biznes - Wsparcie w starcie realizowany jest na terenie województwa małopolskiego i podkarpackiego w ramach Konsorcjum na podstawie Umowy Operacyjnej zawartej z Bankiem Gospodarstwa Krajowego (BGK) w dniu 1 grudnia 2025 r. przez:",
+    "Lubelską Fundację Rozwoju",
+    "Tarnowską Agencję Rozwoju Regionalnego S.A.",
+    "Umowa dotyczy powierzenia Konsorcjum zarządzania środkami Funduszu Szczegółowego w ramach Instrumentu Finansowego Pierwszy biznes - Wsparcie w starcie (Działania 04.01 Europejskie pożyczki na samozatrudnienie w ramach Programu Fundusze Europejskie dla Rozwoju Społecznego 2021-2027 współfinansowanego ze środków Europejskiego Funduszu Społecznego Plus).",
+    "Cel finansowania: wsparcie finansowe dla osób fizycznych, które chcą założyć własną działalność gospodarczą, zapewnienie darmowych usług doradczych i szkoleniowych dla wnioskodawcy/pożyczkobiorcy (dodatkowy element wsparcia)",
+    "Odbiorcy: osoby prywatne",
+    "Realizowane działania: w projekcie uruchomiony zostanie instrument zwrotny w formie pożyczki na samozatrudnienie z możliwością umorzenia części kapitału.",
+    "Efekty projektu: prowadzenie działalności gospodarczej przez co najmniej 12 miesięcy.",
+    "Wartość umowy podpisanej z BGK:",
+    "Wartość projektu: 8.880.000,00 zł",
+    "Wysokość wkładu z Funduszy Europejskich: 7.327.776,00 zł",
+    "Całkowita wartość projektu i wsparcia:",
+    "Wartość projektu: 674.000.000,00 zł",
+    "Wysokość wkładu z Funduszy Europejskich: 556.175.572,36 zł",
+    "Makroregion północno-wschodni obejmujący województwa: lubelskie, mazowieckie, podlaskie i warmińsko-mazurskie",
+    "Informacje ogólne",
+    "Instrument Finansowy Pierwszy biznes - Wsparcie w starcie realizowany jest na terenie województwa małopolskiego i podkarpackiego w ramach Konsorcjum na podstawie Umowy Operacyjnej zawartej z Bankiem Gospodarstwa Krajowego (BGK) w dniu 1 grudnia 2025 r. przez:",
+    "Lubelską Fundację Rozwoju",
+    "Stowarzyszenie \"Centrum Rozwoju Ekonomicznego Pasłęka\"",
+    "Umowa dotyczy powierzenia Konsorcjum zarządzania środkami Funduszu Szczegółowego w ramach Instrumentu Finansowego Pierwszy biznes - Wsparcie w starcie (Działania 04.01 Europejskie pożyczki na samozatrudnienie w ramach Programu Fundusze Europejskie dla Rozwoju Społecznego 2021-2027 współfinansowanego ze środków Europejskiego Funduszu Społecznego Plus).",
+    "Cel finansowania: wsparcie finansowe dla osób fizycznych, które chcą założyć własną działalność gospodarczą, zapewnienie darmowych usług doradczych i szkoleniowych dla wnioskodawcy/pożyczkobiorcy (dodatkowy element wsparcia)",
+    "Odbiorcy: osoby prywatne",
+    "Realizowane działania: w projekcie uruchomiony zostanie instrument zwrotny w formie pożyczki na samozatrudnienie z możliwością umorzenia części kapitału.",
+    "Efekty projektu: prowadzenie działalności gospodarczej przez co najmniej 12 miesięcy.",
+    "Wartość umowy podpisanej z BGK:",
+    "Wartość projektu: 22 200 000,00 zł",
+    "Wysokość wkładu z Funduszy Europejskich: 18 319 440,00 zł",
+    "Całkowita wartość projektu i wsparcia:",
+    "Wartość projektu: 674.000.000,00 zł",
+    "Wysokość wkładu z Funduszy Europejskich: 556.175.572,36 zł",
+    "Kontakt:",
+    "Województwo małopolskie i podkarpackie (Umowa Operacyjna nr 2/WWS/1025/2025/IV/EFS/323):",
+    "Lubelska Fundacja Rozwoju o/Kraków, 30-554 Kraków, ul. Zamknięta 10, tel. 12 311 73 28, kom: 603 086 868, 603 092 353",
+    "Lubelska Fundacja Rozwoju o/Rzeszów, 35-329 Rzeszów, Al. Krzyżanowskiego 6 a lok. 8, tel. 17 853 59 17, kom: 500 062 150, 500 062 168, 665 230 553",
+    "Tarnowska Agencja Rozwoju Regionalnego S.A., 33- 100 Tarnów, ul. Szujskiego 66, tel. 14 621 34 50, 14 623 55 0",
+    "Makroregion północno-wschodni obejmujący województwa: lubelskie, mazowieckie, podlaskie i warmińsko-mazurskie (Umowa Operacyjna nr 2/WWS/1025/2025/IX/EFS/307):",
+    "Lubelska Fundacja Rozwoju, 20-111 Lublin, ul. Rynek 7, tel. 81 528 53 35, 81 528 53 36, kom: 605 207 378, 609 770 825",
+    "Lubelska Fundacja Rozwoju o/Białystok, 15-371 Białystok, Cieszyńska 3A, lok.522, tel. 85 650 62 60, 500 062 246",
+    "Lubelska Fundacja Rozwoju o/Radom, 26-606 Radom, Wierzbicka 26/44 kl. I pok. 2, 22 288 53 50, 607 330 580",
+    "Lubelska Fundacja Rozwoju o/Biała Podlaska, 21-500 Biała Podlaska Piłsudskiego 13/11, tel. 83 344 06 50, kom: 607 330580",
+    "Lubelska Fundacja Rozwoju o/Zamość, 22-400 Zamość, Ul. Odrodzenia 7, tel. 84 639 08 60, kom: 665 103 015",
+    "Stowarzyszenie \"Centrum Rozwoju Ekonomicznego Pasłęka\", 14-400 Pasłęk, Plac Świętego Wojciecha 3, tel. 55 248 10 91, 92, 93",
+    "Pożyczka na samozatrudnienie z projektu \"Pierwszy biznes - Wsparcie w starcie\" jest formą wsparcia finansowego dla osób fizycznych, które chcą założyć własną działalność gospodarczą.",
+    "Główne parametry pożyczki to:",
+    "Wysokość wsparcia: maksymalnie 20-krotność przeciętnego wynagrodzenia",
+    "Oprocentowanie: 0,25 proc.",
+    "Okres spłaty: do 7 lat",
+    "Karencja w spłacie: do 12 miesięcy",
+    "Kto może skorzystać ze wsparcia:",
+    "bezrobotny,",
+    "osoba niezatrudniona i niewykonująca innej pracy zarobkowej,",
+    "osoba, której przychody nie przekraczają przeciętnego wynagrodzenia,",
+    "poszukujący pracy opiekun osoby z niepełnosprawnością,",
+    "student ostatniego roku studiów (I, II stopnia i jednolitych studiów magisterskich),",
+    "powracający z zagranicy.",
+    "Pożyczkę na samozatrudnienie można przeznaczyć na sfinansowanie wydatków niezbędnych do założenia firmy, m.in.:",
+    "zakup środków trwałych oraz towarów na sprzedaż,",
+    "zakup środka transportu,",
+    "kosztów stałych związanych z prowadzeniem działalności do 6 miesięcy od dnia jej uruchomienia.",
+    "Na etapie wnioskowania o pożyczkę na rozpoczęcie działalności gospodarczej i w trakcie korzystania z przyznanego wsparcia, można skorzystać z darmowych usług doradczych i szkoleniowych w zależności od swoich indywidualnych potrzeb.",
+    "Umorzenia",
+    "Kapitał pożyczki można częściowo umorzyć (w części równej 6-krotnej wysokości przeciętnego wynagrodzenia, jednak nie wyższej niż 50 proc. wartości pożyczki), jeśli:",
+    "będziesz prowadził firmę przez minimum 12 miesięcy,",
+    "nie będziesz zalegał ze spłatą rat pożyczki.",
+    "UWAGA! Dodatkowe szczegółowe informacje na temat pożyczki znajdują się w załączonym poniżej Regulaminie udzielania pożyczek na podjęcie działalności gospodarczej oraz świadczenia usług doradztwa i szkoleń.",
+    "Ważne: Umowa pożyczki zawierana jest po rozpoczęciu prowadzenia przez pożyczkobiorcę działalności. Pożyczkobiorca podejmuje działalność na podstawie pozytywnej oceny wniosku o pożyczkę."
+   ],
+   "dokumenty": [
+    {
+     "nazwa": "Regulamin udzielania pożyczek na podjęcie działalności gospodarczej_obowiązujący od 01.12.2025",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/Regulamin-nr-3-FERS-aktualizacja.pdf"
+    },
+    {
+     "nazwa": "Klauzula informacyjna ministra ds. rozwoju regionalnego",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/FERS_klauzula-informacyjna-ministra-wlasciwego-ds-rozwoju-regionalnego.pdf"
+    },
+    {
+     "nazwa": "Tabela prowizji i opłat",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/Tabela-prowizji-i-oplat.pdf"
+    },
+    {
+     "nazwa": "Wskazówki dotyczące wypełniania Wniosku oraz załączników składanych wraz z wnioskiem",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/wskazowki-dotyczace-wypelniania-wniosku-i-zalacznikow.docx"
+    },
+    {
+     "nazwa": "Wzór wniosku o pożyczkę",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_Zal.-nr-14-Wzor-wniosku-o-pozyczke_aktualizacja.docx"
+    },
+    {
+     "nazwa": "załącznik 1 - Wysokość przeciętnego wynagrodzenia (wypełnia LFR)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_zal.-nr-1-wysokosc-przecietnego-wynagr.docx"
+    },
+    {
+     "nazwa": "załącznik 2 - Oświadczenie de minimis",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_zal.-nr-2-oswiadczenie-de-minimis_nowe.docx"
+    },
+    {
+     "nazwa": "załącznik 3 - Oświadczenie o nieubieganiu się o środki",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_Zal.-nr-3-Oswiadczenie-o-nieubieganiu-sie-o-srodki.docx"
+    },
+    {
+     "nazwa": "załącznik 4 - Oświadczenie majątkowe (dot. Wnioskodawcy i Poręczycieli)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_zal.-nr-4-oswiadczenie-majatkowe.docx"
+    },
+    {
+     "nazwa": "załącznik 5 - Oświadczenie o niezatrudnieniu",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_Zal.-nr-5-Oswiadczenie-o-niezatrudnieniu.docx"
+    },
+    {
+     "nazwa": "załącznik 6 - Oświadczenie potwierdzające prawo opieki (dotyczy opiekuna osoby z niepełnosprawnością)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_Zal.-nr-6-Osw.-o-prawie-do-opieki.docx"
+    },
+    {
+     "nazwa": "załącznik 7 - Zaświadczenie z ZUS o niezgłoszeniu wnioskodawcy do ubezpieczenia (jeśli dotyczy)",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 8 - Kopia Zaświadczenia o pomocy de minimis (dotyczy Wnioskodawcy, który otrzymał pomoc de minimis w okresie ostatnich trzech lat podatkowych), potwierdzona ze zgodnością z oryginałem",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 9 - Zaświadczenie z właściwego urzędu skarbowego oraz Zakładu Ubezpieczeń Społecznych o niezaleganiu z wpłatami odpowiednich należności wystawione nie wcześniej niż 3 miesiące przed datą złożenia wniosku (w przypadku osób, które uprzednio prowadziły działalność gospodarczą )",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 10 - Zaświadczenie z uczelni o kontynuacji nauki na ostatnim roku studiów (dotyczy studenta)/Zaświadczenie z powiatowego urzędu pracy potwierdzające posiadanie statusu bezrobotnego (dotyczy bezrobotnego)/ Zaświadczenie z powiatowego urzędu pracy potwierdzające posiadanie statusu poszukującego pracy (dotyczy poszukującego pracy)",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 11 - Potwierdzona za zgodność z oryginałem kopia orzeczenia o niepełnosprawności łącznie ze wskazaniami: konieczności stałej lub długotrwałej opieki lub pomocy innej osoby w związku ze znacznie ograniczoną możliwością samodzielnej egzystencji oraz konieczności stałego współudziału na co dzień opiekuna dziecka w procesie jego leczenia, rehabilitacji i edukacji lub kopia orzeczenia o znacznym stopniu niepełnosprawności (dot. opiekuna osoby z niepełnosprawnością)",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 12 - Zaświadczenie potwierdzające wysokość osiąganych przychodów z okresu ostatnich trzech miesięcy przed miesiącem złożenia wniosku o pożyczkę (jeśli dotyczy)",
+     "url": null
+    },
+    {
+     "nazwa": "załącznik 13 - Oświadczenie poręczyciela",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/zal-nr-13-Oswiadczenie-_poreczyciela-LFR-1.doc"
+    },
+    {
+     "nazwa": "załącznik 14 - Zaświadczenie o zatrudnieniu i zarobkach/potwierdzenie dochodów (w przypadku braku zatrudnienia) poręczyciela",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/zal-nr-14-zasw-o-zatrudnieniu-i-wynagrodzeniu.docx"
+    },
+    {
+     "nazwa": "załącznik 15 - Upoważnienie do sprawdzenia w bazach BIG (dotyczy Wnioskodawcy i poręczycieli)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/upowaznienie-do-weryfikacji-w-BIG.xlsx"
+    },
+    {
+     "nazwa": "załącznik 16 - Klauzula informacyjna BGK (dotyczy Wnioskowdawcy i poręczycieli)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/mono_klauzula-informacyjna_FERS_WWS_2026.docx"
+    },
+    {
+     "nazwa": "załącznik 17 - Klauzula informacyjna ministra właściwego do spraw rozwoju regionalnego (dotyczy Wnioskowdawcy i poręczycieli)",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/Klauzula-informacyjna-ministra-wlasciwego-do-spraw-rozwoju-regionalnego.pdf"
+    },
+    {
+     "nazwa": "załącznik 18 - Oświadczenie PEP",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/zal.-20-Oswiadczenie-PEP.xlsx"
+    },
+    {
+     "nazwa": "załącznik 19 - Dane osobowe szczególnej kategorii",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2024/07/zal.-nr-21-Dane-osobowe-szczegolnej-kategorii.pdf"
+    },
+    {
+     "nazwa": "Dane osobowe szczegółnej kat._po zakończeniu udziału w projekcie",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/Dane-osobowe-szczeg-kategorii_-po-zak-udzialu-w-projekcie.pdf"
+    },
+    {
+     "nazwa": "rozliczenie pożyczki",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/10.2026-zestawienie-dokumentow-ksiegowych-Schemat-do-importu-Wydatku-Kwalifikowanego_WWS-1.xlsx"
+    }
+   ],
+   "linie_dokumentow": [
+    "DOKUMENTY:",
+    "OŚWIADCZENIE POŻYCZKOBIORCY - SYTUACJA PO ZAKOŃCZENIU UDZIAŁU W PROJEKCIE (tj. do 4 tygodni od dnia uzyskania pożyczki lub skorzystania z doradztwa lub szkolenia)",
+    "ROZLICZENIE POŻYCZKI",
+    "Pożyczkobiorca zobowiązany jest do przedłożenia Partnerowi finansującemu rozliczenia Pożyczki w terminie 7 miesięcy liczonych od dnia zawarcia Umowy, wraz z fakturami za zakupione towary i usługi, umowami sprzedaży, rachunkami, dokumentami potwierdzającymi dokonanie płatności lub innymi dokumentami potwierdzającymi poniesione wydatki, zgodnie ze wzorem i wymaganiami określonymi przez Partnera finansującego.",
+    "Podstawą rozliczenia pożyczki na podjęcie działalności gospodarczej są dokumenty potwierdzające poniesienie wydatków zgodnie z przeznaczeniem pożyczki, tj. opłacone faktury lub inne dokumenty księgowe o równoważnej wartości dowodowej, jak również zestawienie wydatków według wzoru znajdującego się na stronie lfr.lublin.pl. Podpisane zestawienie wydatków wraz z dokumentacją należy dostarczyć do Pożyczkodawcy, a jego wersję elektroniczną w formacie xlsx przesłać na adres e-mail: rozliczenie@lfr.lublin.pl. Pożyczkobiorca zobowiązany jest do opatrywania oryginałów w/w dokumentów przedstawionych do rozliczenia, potwierdzających wydatkowanie środków wsparcia, adnotacją w brzmieniu: \"Wydatek poniesiony ze środków Programu Fundusze Europejskie dla Rozwoju Społecznego 2021-2027 w ramach Umowy Inwestycyjnej nr (nr Umowy) zawartej z Partnerem Finansującym - Lubelską Fundacją Rozwoju.\"",
+    "Informacje o akceptacji przedłożonych rozliczeń lub konieczności ich uzupełnień przekazywane będą drogą mailową."
+   ],
+   "linki": [
+    {
+     "nazwa": "Skorygowana lista wniosków",
+     "url": "https://www.lfr.lublin.pl/wp-content/uploads/2025/12/Korekta-z-dnia-16.10_Lista-wnioskow-zlozonych-w-naborze-z-dnia-29.09.2026.pdf"
+    }
+   ]
+  }
+ },
+ "wyslane": {},
+ "przypomnienia": [],
+ "bledy": {
+  "kolejne": 0,
+  "od": null,
+  "pierwszy_blad": null,
+  "alert_wyslany": false
+ },
+ "heartbeat": {
+  "ostatni_dzien": "2026-10-23"
+ },
+ "znacznik_zycia": "2026-10-23"
+}

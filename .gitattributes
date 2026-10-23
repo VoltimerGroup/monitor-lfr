@@ -1,0 +1,4 @@
+# Jednolite końce linii (LF) – stan zapisywany na Windowsie i w Actions wygląda tak samo.
+* text=auto eol=lf
+# Kopia strony do testów: bajt w bajt, bez konwersji.
+tests/fixtures/*.html -text
