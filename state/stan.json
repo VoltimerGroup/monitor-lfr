@@ -343,9 +343,9 @@
  "wyslane": {},
  "przypomnienia": [],
  "bledy": {
-  "kolejne": 0,
-  "od": null,
-  "pierwszy_blad": null,
+  "kolejne": 1,
+  "od": "2026-10-23T20:40:55+00:00",
+  "pierwszy_blad": "Nie udało się pobrać strony po 4 próbach: HTTP 403",
   "alert_wyslany": false
  },
  "heartbeat": {
