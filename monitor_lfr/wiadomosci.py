@@ -6,7 +6,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
-from .klasyfikacja import Klasyfikacja, kanoniczne_wojewodztwo
+from .ekstrakcja import Plik
+from .kanaly import LIMIT_TELEGRAM, przytnij
+from .klasyfikacja import PILNE, Klasyfikacja, kanoniczne_wojewodztwo
 from .porownanie import (
     LINK_NOWY, LINK_USUNIETY, LINK_ZMIENIONY, PLIK_NOWY, PLIK_USUNIETY, PLIK_ZMIENIONY,
     TEKST_DOKUMENTOW, Zmiana,
@@ -17,9 +19,13 @@ TYTUL_INFO = "[INFO] Zmiana na stronie – Pierwszy biznes (LFR)"
 TYTUL_AWARIA = "[AWARIA] Monitor nie może odczytać strony LFR"
 TYTUL_POWROT = "[OK] Monitor znowu działa"
 TYTUL_HEARTBEAT = "[HEARTBEAT] Monitor LFR działa"
+TYTUL_PODGLAD = "🔎 PODGLĄD — aktualna treść strony (to NIE jest zmiana ani nowy nabór)"
 
 MAKS_FRAGMENTU = 500
 MAKS_POZYCJI_INFO = 8
+MAKS_WPISOW_PODGLADU = 5  # tyle starszych wpisów (tytuł + start naboru) wymienia podgląd
+MAKS_ODNOSNIKOW_PODGLADU = 3
+MAKS_TYTULU_WPISU = 100
 
 CHECKLISTA = [
     "komplet dokumentów gotowy WCZEŚNIEJ (wniosek + wszystkie załączniki, sprawdzone i podpisane)",
@@ -81,6 +87,15 @@ def opis_kwot(kwoty: list[Decimal]) -> str | None:
 
 def _przytnij(tekst: str, limit: int) -> str:
     return tekst if len(tekst) <= limit else tekst[: limit - 1].rstrip() + "…"
+
+
+def _odmiana(n: int, jeden: str, kilka: str, wiele: str) -> str:
+    """1 plik, 2 pliki, 5 plików, 22 pliki, 112 plików."""
+    if n == 1:
+        return f"1 {jeden}"
+    if n % 10 in (2, 3, 4) and n % 100 not in (12, 13, 14):
+        return f"{n} {kilka}"
+    return f"{n} {wiele}"
 
 
 def oznaczenie_wojewodztw(wojewodztwa: list[str], moje: list[str]) -> tuple[str, str]:
@@ -195,6 +210,132 @@ def alert_info(pozycje: list[tuple[Zmiana, Klasyfikacja | None]], *, url: str, s
         linie.append("")
     linie.append(f"Link: {url}")
     return "\n".join(linie)
+
+
+# ---------------------------------------------------------------- podgląd (--podglad)
+
+def _tytul_wpisu(linie: list[str], z_druga_linia: bool = False) -> str:
+    """Pierwsza linia wpisu; sam nagłówek w rodzaju „KOMUNIKAT:” sklejamy z następną linią.
+
+    `z_druga_linia` – dla wpisów o tym samym nagłówku (np. dwa razy „III NABÓR…”: ogłoszenie
+    i lista wniosków), żeby dało się je odróżnić.
+    """
+    if z_druga_linia and len(linie) > 1:
+        return _przytnij(f"{linie[0]} – {linie[1]}", MAKS_TYTULU_WPISU + 40)
+    tytul = linie[0]
+    for linia in linie[1:]:
+        if len(tytul) >= 25:
+            break
+        tytul += " " + linia
+    return _przytnij(tytul, MAKS_TYTULU_WPISU)
+
+
+def _start_wpisu(k: Klasyfikacja, strefa: ZoneInfo) -> str | None:
+    """Start naboru odczytany z wpisu – tylko pewna data; bez godziny, gdy jej nie podano."""
+    if k.start is None or k.dane is None or not k.dane.pewna_data:
+        return None
+    if k.dane.godzina_startu is None:
+        return f"{k.start.astimezone(strefa):%d.%m.%Y}"
+    return format_krotki(k.start, strefa)
+
+
+def _dane_klasyfikacji(k: Klasyfikacja, moje: list[str], strefa: ZoneInfo) -> list[str]:
+    """Co klasyfikacja odczytała z wpisu – wyłącznie pola, które naprawdę odczytała."""
+    d = k.dane
+    if d is None:
+        return []
+    linie: list[str] = []
+    if d.wojewodztwa:
+        linie.append(oznaczenie_wojewodztw(d.wojewodztwa, moje)[1])
+        linie.append("Województwa: " + ", ".join(d.wojewodztwa))
+    if d.numer:
+        linie.append(f"Nabór: {d.numer}")
+    if k.start is not None:
+        start = (f"Start: {k.start.astimezone(strefa):%d.%m.%Y} (godziny nie podano)"
+                 if d.godzina_startu is None else f"Start: {format_daty(k.start, strefa)}")
+        if not d.pewna_data:
+            start += " (data bez słów „od dnia”/„Rozpoczęcie naboru” – sprawdź w ogłoszeniu)"
+        linie.append(start)
+    if d.zapowiedz:
+        linie.append(f"Planowany termin: {d.zapowiedz}")
+    if d.kwoty:
+        linie.append(f"Pula: {opis_kwot(d.kwoty)}")
+    return linie
+
+
+def podglad_strony(
+    wpisy: list[tuple[Zmiana, Klasyfikacja]],
+    *,
+    url: str,
+    moje: list[str],
+    strefa: ZoneInfo,
+    teraz: datetime,
+    dokumenty: list[Plik] | None,
+    odnosniki: list[Plik],
+    z_pliku: bool = False,
+) -> str:
+    """--podglad: najnowszy wpis w formie prawdziwego alertu + krótki przegląd strony.
+
+    `wpisy` – od najnowszego; każdy jako `Zmiana` „dopisana na górze” razem z klasyfikacją.
+    Pokazujemy tylko to, co odczytały ekstrakcja i klasyfikacja. Stopka (godzina odczytu
+    i adres) zostaje zawsze – przy limicie Telegrama najpierw ubywa listy starszych wpisów.
+    """
+    z, k = wpisy[0]
+    glowna = [
+        TYTUL_PODGLAD,
+        "Najnowszy wpis ze strony – tak wyglądałby alert, gdyby ten wpis właśnie się pojawił.",
+        "Monitor nic nie zapisał ani nie zaplanował (stan bez zmian).",
+        "",
+        "----- przykład alertu -----",
+    ]
+    if k.poziom == PILNE:
+        glowna.append(alert_pilny(k, z, url=url, moje=moje, strefa=strefa, teraz=teraz, przypomnienia=[],
+                                  powod_braku_przypomnien="podgląd ich nie planuje"))
+    else:
+        glowna.append(alert_info([(z, k)], url=url, strefa=strefa))
+    glowna += ["----- koniec przykładu -----", "", f"Klasyfikacja wpisu: {k.poziom} – {k.powod}",
+               "Dopasowane wzorce naboru: " + (", ".join(k.wzorce) if k.wzorce else "brak")]
+    if k.poziom != PILNE:
+        glowna += _dane_klasyfikacji(k, moje, strefa)  # alert PILNY pokazuje je sam
+    glowna.append("")
+    if odnosniki:
+        glowna.append(f"Odnośniki w treści strony ({len(odnosniki)}):")
+        for p in odnosniki[:MAKS_ODNOSNIKOW_PODGLADU]:
+            glowna.append(f"- {_przytnij(p.nazwa, MAKS_TYTULU_WPISU)}\n   {p.url or '(bez linku)'}")
+        if len(odnosniki) > MAKS_ODNOSNIKOW_PODGLADU:
+            glowna.append("…oraz " + _odmiana(len(odnosniki) - MAKS_ODNOSNIKOW_PODGLADU, "inny", "inne", "innych")
+                          + " – zobacz stronę.")
+    if dokumenty is None:
+        glowna.append("Dokumenty do pobrania: nie znaleziono sekcji na stronie.")
+    else:
+        glowna.append("Dokumenty do pobrania: " + _odmiana(len(dokumenty), "plik", "pliki", "plików") + ".")
+
+    starsze = []
+    tytuly = [_tytul_wpisu(z_st.nowe) for z_st, _ in wpisy[1:]]
+    for (z_st, k_st), tytul in zip(wpisy[1:], tytuly):
+        if tytuly.count(tytul) > 1:
+            tytul = _tytul_wpisu(z_st.nowe, z_druga_linia=True)
+        start = _start_wpisu(k_st, strefa)
+        starsze.append(f"• start naboru {start} – {tytul}" if start else f"• {tytul}")
+
+    def z_lista(n: int) -> str:
+        linie = list(glowna)
+        if n:
+            linie += ["", "Starsze wpisy na stronie:"] + starsze[:n]
+        if len(starsze) > n:
+            linie.append("…i jeszcze " + _odmiana(len(starsze) - n, "starszy wpis", "starsze wpisy",
+                                                  "starszych wpisów") + " na stronie.")
+        return "\n".join(linie)
+
+    zrodlo = " – treść z pliku (--plik), nie z sieci" if z_pliku else ""
+    stopka = f"\n\nOdczyt strony: {format_daty(teraz, strefa)} ({strefa.key}){zrodlo}\n{url}"
+    limit = LIMIT_TELEGRAM - len(stopka)
+    n = min(MAKS_WPISOW_PODGLADU, len(starsze))
+    tresc = z_lista(n)
+    while len(tresc) > limit and n > 0:
+        n -= 1
+        tresc = z_lista(n)
+    return przytnij(tresc, limit) + stopka
 
 
 # ---------------------------------------------------------------- przypomnienia

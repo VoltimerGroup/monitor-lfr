@@ -249,6 +249,21 @@ def wyciagnij_tresc(
     return Tresc(linie=linie, dokumenty=dokumenty, linie_dokumentow=linie_dok, linki=linki)
 
 
+def tytul_artykulu(html: str, selektory: list[str]) -> list[str]:
+    """Linie tytułu artykułu (pierwszy <h1> w kontenerze treści) – jak w `Tresc.linie`.
+
+    Potrzebne w podglądzie (--podglad), żeby nagłówek strony (data publikacji + tytuł)
+    nie udawał najnowszego wpisu. Brak kontenera albo <h1> = pusta lista.
+    """
+    zupa = BeautifulSoup(html, _parser())
+    for sel in selektory:
+        kontener = zupa.select_one(sel)
+        if kontener is not None:
+            h1 = kontener.find("h1")
+            return linie_blokowe(h1) if h1 is not None else []
+    return []
+
+
 def _podpowiedz(html: str, frazy: list[str]) -> str:
     """Rozróżnia „treść ładowana JavaScriptem” od „zmienił się układ HTML”."""
     surowy = normalizuj(BeautifulSoup(html, _parser()).get_text(" ")).casefold()

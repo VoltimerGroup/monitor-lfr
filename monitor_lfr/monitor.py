@@ -17,11 +17,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 from . import wiadomosci as W
-from .ekstrakcja import BladEkstrakcji, Tresc, wyciagnij_tresc
+from .ekstrakcja import BladEkstrakcji, Tresc, tytul_artykulu, wyciagnij_tresc
 from .kanaly import BladWysylki, Kanal
 from .klasyfikacja import PILNE, Klasyfikacja, klasyfikuj
 from .konfiguracja import Konfiguracja
-from .normalizacja import WERSJA_NORMALIZACJI
+from .normalizacja import WERSJA_NORMALIZACJI, czy_separator, klucz
 from .pobieranie import BladPobierania, Odpowiedz
 from .porownanie import TEKST, Zmiana, porownaj
 from .stan import MagazynStanu
@@ -347,3 +347,80 @@ def tekst_testowego_alertu(konfig: Konfiguracja, teraz: datetime) -> str:
             plan.append({"termin": (kl.start - p.wyprzedzenie).isoformat(), "etykieta": p.etykieta})
     return W.alert_pilny(kl, z, url=konfig.url, moje=konfig.moje_wojewodztwa, strefa=konfig.strefa,
                          teraz=teraz, przypomnienia=plan, test=True)
+
+
+# ---------------------------------------------------------------- --podglad
+
+def wpisy_strony(linie: list[str], tytul: list[str] | None = None) -> list[Zmiana]:
+    """Wpisy artykułu (od najnowszego) jako `Zmiana` – tak, jakby każdy właśnie dopisano.
+
+    Wpis = linie między separatorami („……”). Kontrakt jak z `porownaj()` dla bloku dopisanego
+    na górze: `nowe` = linie wpisu, `stare` puste, `kontekst` = sekcja od jej początku do końca
+    wpisu – u najnowszego razem z nagłówkiem strony (data publikacji i tytuł <h1>), który
+    sam wpisem nie jest.
+    """
+    sekcje: list[list[str]] = [[]]
+    for linia in linie:
+        if czy_separator(linia):
+            sekcje.append([])
+        else:
+            sekcje[-1].append(linia)
+    wynik: list[Zmiana] = []
+    for nr, sekcja in enumerate(sekcje):
+        naglowek = 0
+        if nr == 0 and tytul:
+            # Tytuł jest na samej górze (najwyżej za linią z datą publikacji).
+            klucze = [klucz(l) for l in sekcja[: len(tytul) + 3]]
+            if klucz(tytul[-1]) in klucze:
+                naglowek = klucze.index(klucz(tytul[-1])) + 1
+        if sekcja[naglowek:]:
+            wynik.append(Zmiana(rodzaj=TEKST, nowe=sekcja[naglowek:], stare=[], kontekst=list(sekcja)))
+    return wynik
+
+
+def tekst_podgladu(konfig: Konfiguracja, tresc: Tresc, teraz: datetime, *,
+                   tytul: list[str] | None = None, z_pliku: bool = False) -> str | None:
+    """Treść wiadomości --podglad (None, gdy na stronie nie ma żadnego wpisu)."""
+    wpisy = wpisy_strony(tresc.linie, tytul)
+    if not wpisy:
+        return None
+    sklasyfikowane = [(z, klasyfikuj(z, teraz, konfig.strefa, konfig.godzina_startu_gdy_brak)) for z in wpisy]
+    return W.podglad_strony(
+        sklasyfikowane, url=konfig.url, moje=konfig.moje_wojewodztwa, strefa=konfig.strefa, teraz=teraz,
+        dokumenty=tresc.dokumenty, odnosniki=tresc.linki, z_pliku=z_pliku,
+    )
+
+
+def podglad(konfig: Konfiguracja, kanal: Kanal, *, zrodlo: Callable[[], Odpowiedz],
+            zegar: Callable[[], datetime] = teraz_utc) -> int:
+    """--podglad: JEDNA wiadomość z aktualną treścią strony (najnowszy wpis w formie alertu).
+
+    Celowo bez `MagazynStanu`: niczego nie czyta ani nie zapisuje w state/ – wersja bazowa,
+    wysłane alerty, przypomnienia, liczniki błędów, heartbeat i log.jsonl zostają nietknięte.
+    Kod wyjścia: 0 – wysłano; 1 – błąd pobrania/odczytu strony albo wysyłki.
+    Przy błędzie strony nic nie jest wysyłane.
+    """
+    teraz = zegar().astimezone(timezone.utc)
+    try:
+        odp = zrodlo()
+        tresc = wyciagnij_tresc(
+            odp.html, konfig.selektory_tresci, konfig.selektor_dokumentow,
+            konfig.oczekiwane_frazy, konfig.min_linii, konfig.url,
+        )
+    except BladPobierania as e:
+        print(f"PODGLĄD NIEUDANY – błąd pobrania strony: {e}", file=sys.stderr)
+        return 1
+    except BladEkstrakcji as e:
+        print(f"PODGLĄD NIEUDANY – nie da się wyciągnąć treści: {e}", file=sys.stderr)
+        return 1
+    tekst = tekst_podgladu(konfig, tresc, teraz, tytul=tytul_artykulu(odp.html, konfig.selektory_tresci),
+                           z_pliku=odp.status_http is None)
+    if tekst is None:
+        print("PODGLĄD NIEUDANY – na stronie nie znaleziono żadnego wpisu.", file=sys.stderr)
+        return 1
+    try:
+        kanal.wyslij(tekst)
+    except BladWysylki as e:
+        print(f"PODGLĄD NIEUDANY – błąd wysyłki: {e}", file=sys.stderr)
+        return 1
+    return 0

@@ -1,4 +1,4 @@
-"""Wiersz poleceń: python -m monitor_lfr [--dry-run] [--test-alert] [--plik strona.html]"""
+"""Wiersz poleceń: python -m monitor_lfr [--dry-run] [--test-alert | --podglad] [--plik strona.html]"""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .kanaly import BladWysylki, KanalKonsola, KanalNieskonfigurowany, kanal_z_srodowiska
 from .konfiguracja import DOMYSLNY_KATALOG_STANU, BladKonfiguracji, wczytaj
-from .monitor import Monitor, teraz_utc, tekst_testowego_alertu
+from .monitor import Monitor, podglad, teraz_utc, tekst_testowego_alertu
 from .pobieranie import Odpowiedz, pobierz_strone
 from .stan import BladStanu, MagazynStanu
 
@@ -23,6 +23,9 @@ def _parser() -> argparse.ArgumentParser:
                    help="nic nie wysyła – drukuje wiadomości w konsoli (stan zapisuje jak zwykły przebieg)")
     p.add_argument("--test-alert", action="store_true",
                    help="wysyła przykładowy alert PILNY (sprawdzenie dostarczenia na telefon); nie zmienia stanu")
+    p.add_argument("--podglad", action="store_true",
+                   help="wysyła JEDNĄ wiadomość z aktualną treścią strony (najnowszy wpis w formie alertu); "
+                        "nie zmienia stanu")
     p.add_argument("--plik", metavar="HTML", help="czytaj stronę z pliku zamiast z sieci")
     p.add_argument("--config", metavar="JSON", help="ścieżka do config.json (domyślnie w katalogu repozytorium)")
     p.add_argument("--stan-dir", metavar="KATALOG",
@@ -41,6 +44,10 @@ def _utf8_na_wyjsciu() -> None:
 def main(argv: list[str] | None = None) -> int:
     _utf8_na_wyjsciu()
     args = _parser().parse_args(argv)
+    if args.podglad and args.test_alert:
+        # Dwie różne wiadomości – zamiast zgadywać kolejność, prosimy o osobne uruchomienia.
+        print("BŁĄD: --podglad i --test-alert wykluczają się – uruchom każdą opcję osobno.", file=sys.stderr)
+        return 2
     try:
         konfig = wczytaj(args.config)
     except BladKonfiguracji as e:
@@ -75,6 +82,13 @@ def main(argv: list[str] | None = None) -> int:
                 konfig.url, timeout_s=konfig.timeout_s, ponowienia=konfig.ponowienia,
                 backoff_s=konfig.backoff_s, user_agent=konfig.user_agent,
             )
+
+    if args.podglad:
+        # Bez MagazynStanu: podgląd nie czyta ani nie zapisuje niczego w katalogu stanu.
+        kod = podglad(konfig, kanal, zrodlo=zrodlo)
+        if kod == 0:
+            print("Podgląd strony wysłany." if not args.dry_run else "Podgląd strony wydrukowany (dry-run).")
+        return kod
 
     magazyn = MagazynStanu(Path(args.stan_dir) if args.stan_dir else DOMYSLNY_KATALOG_STANU)
     try:

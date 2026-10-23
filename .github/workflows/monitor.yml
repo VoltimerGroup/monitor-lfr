@@ -14,6 +14,10 @@ on:
         description: "Wyślij TYLKO testowy alert PILNY (sprawdzenie, czy Telegram dociera na telefon)"
         type: boolean
         default: false
+      podglad:
+        description: "Wyślij TYLKO podgląd: aktualna treść strony w formie alertu (stan bez zmian)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write # commit pliku stanu
@@ -63,8 +67,19 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python -m monitor_lfr --test-alert
 
+      # Podgląd = jedna wiadomość z aktualną treścią strony. Niczego nie zapisuje w state/.
+      - name: Podgląd strony
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.podglad }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUNBUFFERED: "1"
+        run: python -m monitor_lfr --podglad
+
+      # Zwykłe sprawdzenie NIE rusza przy ręcznym teście ani podglądzie – inaczej „Run workflow”
+      # z zaznaczonym polem przesuwałby wersję bazową i mógł wysłać prawdziwe alerty.
       - name: Sprawdź stronę LFR
-        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test_alert) }}
+        if: ${{ !(github.event_name == 'workflow_dispatch' && (inputs.test_alert || inputs.podglad)) }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -81,8 +96,9 @@ jobs:
       # Commit tylko, gdy zmienił się state/stan.json (nowa wersja strony, alert,
       # przypomnienie, licznik błędów, heartbeat) – oraz raz na dobę dzięki znacznikowi
       # „znacznik_zycia”, żeby GitHub nie wyłączył harmonogramu po 60 dniach bez aktywności.
+      # Test alertu i podgląd stanu nie zmieniają – wtedy krok w ogóle się nie wykonuje.
       - name: Commit stanu (tylko gdy stan.json się zmienił)
-        if: ${{ always() }}
+        if: ${{ always() && !(github.event_name == 'workflow_dispatch' && (inputs.test_alert || inputs.podglad)) }}
         run: |
           if [ -z "$(git status --porcelain -- state/stan.json)" ]; then
             echo "Stan bez zmian – brak commitu."

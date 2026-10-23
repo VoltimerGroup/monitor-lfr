@@ -27,12 +27,13 @@ powiadomienie na Telegram:
 3. [Bot Telegram krok po kroku](#bot-telegram-krok-po-kroku)
 4. [Uruchomienie w GitHub Actions](#uruchomienie-w-github-actions)
 5. [Testowy alert z Actions](#testowy-alert-z-actions)
-6. [Konfiguracja](#konfiguracja)
-7. [Jak sprawdzić, że działa](#jak-sprawdzić-że-działa)
-8. [Jak zatrzymać](#jak-zatrzymać)
-9. [Ograniczenia – uczciwie](#ograniczenia--uczciwie)
-10. [Testy](#testy)
-11. [Struktura plików](#struktura-plików)
+6. [Podgląd](#podgląd)
+7. [Konfiguracja](#konfiguracja)
+8. [Jak sprawdzić, że działa](#jak-sprawdzić-że-działa)
+9. [Jak zatrzymać](#jak-zatrzymać)
+10. [Ograniczenia – uczciwie](#ograniczenia--uczciwie)
+11. [Testy](#testy)
+12. [Struktura plików](#struktura-plików)
 
 ---
 
@@ -124,6 +125,7 @@ Opcje:
 |---|---|
 | `--dry-run` | nic nie wysyła, drukuje wiadomości; **stan zapisuje jak zwykły przebieg** |
 | `--test-alert` | wysyła przykładowy alert PILNY (sprawdzenie dostarczenia na telefon); stanu nie zmienia |
+| `--podglad` | wysyła JEDNĄ wiadomość z aktualną treścią strony (najnowszy wpis w formie alertu); stanu nie zmienia – patrz [Podgląd](#podgląd) |
 | `--plik strona.html` | czyta stronę z pliku zamiast z sieci |
 | `--stan-dir KATALOG` | inny katalog stanu (np. do eksperymentów, żeby nie ruszać `state/`) |
 | `--config plik.json` | inny plik konfiguracji |
@@ -139,8 +141,9 @@ python -m monitor_lfr --test-alert
 > Uwaga: `state/stan.json` jest wspólny z botem w GitHub. Do eksperymentów lokalnych używaj
 > `--stan-dir C:\Temp\stan-lfr`, a przed commitem czegokolwiek zrób `git pull`.
 
-Kody wyjścia: `0` – OK, `1` – nie udało się wysłać powiadomienia (albo brak sekretów),
-`2` – błąd konfiguracji/stanu/pliku wejściowego.
+Kody wyjścia: `0` – OK, `1` – nie udało się wysłać powiadomienia (albo brak sekretów;
+przy `--podglad` także: nie udało się pobrać/odczytać strony), `2` – błąd konfiguracji/stanu/pliku
+wejściowego albo `--podglad` razem z `--test-alert`.
 
 ---
 
@@ -187,7 +190,9 @@ Co robi workflow `.github/workflows/monitor.yml`:
   commit z chwili wywołania – inaczej czytałby stary `stan.json` i wysłał te same alerty drugi
   raz. Dlatego „Run workflow” w trakcie przebiegu z crona jest bezpieczne,
 - `actions/setup-python` z cache pip,
-- uruchomienie `python -m monitor_lfr` z sekretami w zmiennych środowiskowych,
+- uruchomienie `python -m monitor_lfr` z sekretami w zmiennych środowiskowych (przy ręcznym
+  „Run workflow” z zaznaczonym `test_alert` albo `podglad` – zamiast zwykłego sprawdzenia; wtedy
+  nie ma też commitu stanu),
 - **commit `state/stan.json` tylko, gdy się zmienił** (tożsamość bota `github-actions[bot]`).
   Jeśli ktoś w międzyczasie wypchnął commit, krok robi rebase na czubek gałęzi (przy konflikcie
   w plikach stanu wygrywa wersja z tego przebiegu – ona pamięta wysłane przed chwilą alerty),
@@ -216,6 +221,36 @@ uruchamiają).
 Na telefon przyjdzie alert PILNY z fikcyjnym IV naborem (start za 14 dni) poprzedzony
 nagłówkiem „TO JEST WIADOMOŚĆ TESTOWA”. Stan monitora się nie zmienia.
 Bez zaznaczenia pola „Run workflow” wykonuje zwykłe sprawdzenie strony od razu.
+
+---
+
+## Podgląd
+
+Chcesz zobaczyć, jak wygląda alert z **prawdziwą** treścią strony (a nie z atrapą z testowego
+alertu)?
+
+**Actions → Monitor LFR → Run workflow** → zaznacz `podglad`
+(„Wyślij TYLKO podgląd…”) → **Run workflow**.
+
+Na Telegram przyjdzie JEDNA wiadomość:
+
+- pierwsza linia: `🔎 PODGLĄD — aktualna treść strony (to NIE jest zmiana ani nowy nabór)`,
+- najnowszy wpis ze strony sformatowany dokładnie tak, jak w prawdziwym alercie (PILNE albo INFO –
+  według zwykłej klasyfikacji; jedyna różnica: przypomnienia nie są planowane),
+- co odczytała klasyfikacja (poziom, dopasowane wzorce; przy INFO także województwa z oznaczeniem
+  „dotyczy Twoich województw”, numer, start, pula – tylko to, co faktycznie odczytano),
+- odnośniki w treści i liczba plików w „Dokumenty do pobrania”,
+- kilka starszych wpisów (start naboru, jeśli odczytany, + tytuł),
+- godzina odczytu (czas polski) i adres strony.
+
+Podgląd **nie zmienia stanu** – nie dotyka `state/stan.json` ani `state/log.jsonl` (wersja bazowa,
+wysłane alerty, przypomnienia i liczniki błędów zostają bez zmian), a w tym przebiegu nie
+wykonuje się zwykłe sprawdzenie strony ani commit stanu. Gdy strony nie da się pobrać, nic nie
+jest wysyłane, a przebieg kończy się na czerwono.
+
+Lokalnie, bez wysyłki: `python -m monitor_lfr --podglad --dry-run`.
+`--podglad` i `--test-alert` razem w jednym poleceniu to błąd (kod 2); w Actions zaznaczenie obu pól
+uruchamia dwa osobne kroki: najpierw testowy alert, potem podgląd.
 
 ---
 
@@ -339,6 +374,8 @@ tworzy nowy monitor czytający stan z dysku – jak restart w Actions. Pokrywaj�
 | województwa z `config.json` w dowolnej odmianie; nierozpoznane = błąd konfiguracji | `tests/test_konfiguracja.py` |
 | przeszła data obok przyszłej, data bez roku w grudniu, zmiana zapowiedzi | `tests/test_klasyfikacja.py` (sekcja „poprawki po recenzji”) |
 | workflow: checkout czubka gałęzi, commit stanu po równoległym commicie (prawdziwy git) | `tests/test_workflow.py` |
+| workflow: które kroki ruszają przy cronie, teście alertu i podglądzie | `tests/test_workflow.py` |
+| `--podglad`: oznaczenie PODGLĄD, najnowszy wpis jak w prawdziwym alercie, stan bajt w bajt bez zmian, błąd pobrania = kod 1 i zero wiadomości | `tests/test_podglad.py` |
 
 Aktualizacja kopii strony: pobierz stronę do nowego pliku w `tests/fixtures/` i podmień nazwę
 w `tests/conftest.py` (`PLIK_STRONY`).
@@ -350,21 +387,21 @@ w `tests/conftest.py` (`PLIK_STRONY`).
 ```
 monitor-lfr/
 ├── .github/workflows/
-│   ├── monitor.yml          # cron co 10 min, test-alert, commit stanu
+│   ├── monitor.yml          # cron co 10 min, test-alert, podgląd, commit stanu
 │   └── testy.yml            # pytest po zmianie kodu
 ├── monitor_lfr/
 │   ├── __main__.py          # python -m monitor_lfr
-│   ├── cli.py               # opcje --dry-run, --test-alert, --plik, --stan-dir, --config
+│   ├── cli.py               # opcje --dry-run, --test-alert, --podglad, --plik, --stan-dir, --config
 │   ├── konfiguracja.py      # config.json + wartości domyślne
 │   ├── pobieranie.py        # HTTP: timeout, ponowienia, backoff, User-Agent
 │   ├── ekstrakcja.py        # główna treść, pliki, odnośniki (selektory)
 │   ├── normalizacja.py      # białe znaki, NBSP, myślniki, cudzysłowy, klucze porównań
 │   ├── porownanie.py        # diff wersji – tylko nowe fragmenty
 │   ├── klasyfikacja.py      # PILNE/INFO, numer, województwa, data, godzina, pula
-│   ├── wiadomosci.py        # treść alertów, przypomnień, heartbeatu
+│   ├── wiadomosci.py        # treść alertów, przypomnień, heartbeatu, podglądu
 │   ├── kanaly.py            # Telegram, konsola
 │   ├── stan.py              # state/stan.json, state/log.jsonl
-│   └── monitor.py           # jeden przebieg: awarie, deduplikacja, przypomnienia, heartbeat
+│   └── monitor.py           # jeden przebieg: awarie, deduplikacja, przypomnienia, heartbeat; podgląd
 ├── state/
 │   ├── stan.json            # stan (commitowany przez bota)
 │   └── log.jsonl            # ostatnie sprawdzenia

@@ -65,6 +65,78 @@ def test_concurrency_bez_anulowania_trwajacego():
     assert re.search(r"^concurrency:\n\s+group: monitor-lfr\n\s+cancel-in-progress: false$", tekst, re.M)
 
 
+# ------------------------------------------------------------------ podgląd (--podglad) i warunki kroków
+
+def _warunek(nazwa: str) -> str | None:
+    """Wyrażenie z `if:` kroku (bez ${{ }}); None = krok bez warunku."""
+    for linia in _krok(nazwa):
+        m = re.match(r"^\s+if:\s*(.+?)\s*$", linia)
+        if m:
+            w = re.fullmatch(r"\$\{\{\s*(.*?)\s*\}\}", m.group(1))
+            return w.group(1) if w else m.group(1)
+    return None
+
+
+def _wykonuje_sie(nazwa: str, zdarzenie: str, wejscia: dict) -> bool:
+    """Ocenia `if:` kroku jak GitHub – dla użytych tu operatorów (&&, ||, !, ==, always()).
+
+    Przy cronie kontekst `inputs` jest pusty – każde `inputs.x` to null (fałsz).
+    """
+    w = _warunek(nazwa)
+    if w is None:
+        return True  # domyślnie success() – w tych scenariuszach poprzednie kroki się udają
+    py = w.replace("&&", " and ").replace("||", " or ").replace("always()", "True")
+    py = re.sub(r"!(?!=)", " not ", py)
+    py = re.sub(r"\binputs\.(\w+)", lambda m: repr(wejscia.get(m.group(1))), py)
+    py = py.replace("github.event_name", repr(zdarzenie))
+    assert re.fullmatch(r"[\w\s()'=]*", py), f"nieobsługiwane wyrażenie w kroku {nazwa!r}: {w}"
+    return bool(eval(py, {"__builtins__": {}}, {}))
+
+
+PRZYPADKI = {
+    "cron": ("schedule", {}),
+    "Run workflow bez pól": ("workflow_dispatch", {"test_alert": False, "podglad": False}),
+    "test alertu": ("workflow_dispatch", {"test_alert": True, "podglad": False}),
+    "podgląd": ("workflow_dispatch", {"test_alert": False, "podglad": True}),
+    "oba pola": ("workflow_dispatch", {"test_alert": True, "podglad": True}),
+}
+# krok -> przypadki, w których MA się wykonać
+OCZEKIWANE = {
+    "Testowy alert PILNY": {"test alertu", "oba pola"},
+    "Podgląd strony": {"podgląd", "oba pola"},
+    "Sprawdź stronę LFR": {"cron", "Run workflow bez pól"},
+    "Commit stanu": {"cron", "Run workflow bez pól"},
+}
+
+
+@pytest.mark.parametrize("przypadek", list(PRZYPADKI))
+def test_ktore_kroki_wykonuja_sie(przypadek):
+    """Podgląd i test alertu NIE uruchamiają zwykłego sprawdzenia ani commitu stanu."""
+    zdarzenie, wejscia = PRZYPADKI[przypadek]
+    wynik = {krok: _wykonuje_sie(krok, zdarzenie, wejscia) for krok in OCZEKIWANE}
+    assert wynik == {krok: przypadek in kiedy for krok, kiedy in OCZEKIWANE.items()}
+
+
+def test_wejscie_podglad_w_workflow_dispatch():
+    tekst = WORKFLOW.read_text(encoding="utf-8")
+    m = re.search(r"^      podglad:\n((?:        .*\n)+)", tekst, re.M)
+    assert m, "brak wejścia workflow_dispatch „podglad”"
+    blok = m.group(1)
+    assert re.search(r"^        type: boolean$", blok, re.M)
+    assert re.search(r"^        default: false$", blok, re.M)
+    opis = re.search(r'^        description: "(.+)"$', blok, re.M)
+    assert opis and "podgląd" in opis.group(1).lower() and "stan bez zmian" in opis.group(1)
+
+
+def test_krok_podgladu_wola_cli_z_sekretami():
+    krok = "\n".join(_krok("Podgląd strony"))
+    assert re.search(r"^\s+run: python -m monitor_lfr --podglad$", krok, re.M), krok
+    assert "TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}" in krok
+    assert "TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}" in krok
+    # Zwykły krok nie dostał przypadkiem flagi podglądu.
+    assert re.search(r"^\s+run: python -m monitor_lfr$", "\n".join(_krok("Sprawdź stronę LFR")), re.M)
+
+
 # ------------------------------------------------------------------ prawdziwy git
 
 def _posix(p: Path) -> str:
