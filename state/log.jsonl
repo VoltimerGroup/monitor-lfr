@@ -4,3 +4,5 @@
 {"czas": "2026-10-23T20:48:22+00:00", "czas_lokalny": "2026-10-23 22:48:22", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-10-23T23:34:19+00:00", "czas_lokalny": "2026-10-24 01:34:19", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-10-24T01:56:28+00:00", "czas_lokalny": "2026-10-24 03:56:28", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-10-24T06:51:11+00:00", "czas_lokalny": "2026-10-24 08:51:11", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-10-24T11:40:27+00:00", "czas_lokalny": "2026-10-24 13:40:27", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
