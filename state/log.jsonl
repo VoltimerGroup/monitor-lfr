@@ -39,3 +39,6 @@
 {"czas": "2026-10-29T23:36:17+00:00", "czas_lokalny": "2026-10-30 00:36:17", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-10-30T02:54:03+00:00", "czas_lokalny": "2026-10-30 03:54:03", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-10-30T09:35:01+00:00", "czas_lokalny": "2026-10-30 10:35:01", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-10-30T16:12:58+00:00", "czas_lokalny": "2026-10-30 17:12:58", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-10-30T20:52:38+00:00", "czas_lokalny": "2026-10-30 21:52:38", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-10-31T00:21:20+00:00", "czas_lokalny": "2026-10-31 01:21:20", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
