@@ -48,3 +48,4 @@
 {"czas": "2026-10-31T20:06:21+00:00", "czas_lokalny": "2026-10-31 21:06:21", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-10-31T23:20:00+00:00", "czas_lokalny": "2026-11-01 00:20:00", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-01T02:20:35+00:00", "czas_lokalny": "2026-11-01 03:20:35", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-01T09:24:01+00:00", "czas_lokalny": "2026-11-01 10:24:01", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
