@@ -64,3 +64,4 @@
 {"czas": "2026-11-04T17:35:04+00:00", "czas_lokalny": "2026-11-04 18:35:04", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-04T22:51:15+00:00", "czas_lokalny": "2026-11-04 23:51:15", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-05T02:54:02+00:00", "czas_lokalny": "2026-11-05 03:54:02", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-05T10:19:10+00:00", "czas_lokalny": "2026-11-05 11:19:10", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
