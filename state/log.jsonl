@@ -77,3 +77,4 @@
 {"czas": "2026-11-07T19:51:14+00:00", "czas_lokalny": "2026-11-07 20:51:14", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-07T23:07:41+00:00", "czas_lokalny": "2026-11-08 00:07:41", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-08T02:23:08+00:00", "czas_lokalny": "2026-11-08 03:23:08", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-08T09:19:26+00:00", "czas_lokalny": "2026-11-08 10:19:26", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
