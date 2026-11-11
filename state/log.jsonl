@@ -88,3 +88,5 @@
 {"czas": "2026-11-10T12:57:02+00:00", "czas_lokalny": "2026-11-10 13:57:02", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-10T20:12:14+00:00", "czas_lokalny": "2026-11-10 21:12:14", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-11T00:42:13+00:00", "czas_lokalny": "2026-11-11 01:42:13", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-11T07:14:26+00:00", "czas_lokalny": "2026-11-11 08:14:26", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-11T15:20:40+00:00", "czas_lokalny": "2026-11-11 16:20:40", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
