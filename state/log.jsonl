@@ -113,3 +113,5 @@
 {"czas": "2026-11-17T00:11:08+00:00", "czas_lokalny": "2026-11-17 01:11:08", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-17T07:51:15+00:00", "czas_lokalny": "2026-11-17 08:51:15", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-17T17:06:42+00:00", "czas_lokalny": "2026-11-17 18:06:42", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-17T23:49:52+00:00", "czas_lokalny": "2026-11-18 00:49:52", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-18T04:44:50+00:00", "czas_lokalny": "2026-11-18 05:44:50", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
