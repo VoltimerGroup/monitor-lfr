@@ -2,8 +2,8 @@
  "wersja_schematu": 1,
  "wersja_normalizacji": 1,
  "strona": {
-  "hash": "2787433f55bddf443a14fa50d5fad4e751cd82ac99f7ffc5bcbcdb1362e82b55",
-  "od": "2026-10-23T20:04:15+00:00",
+  "hash": "9355adb2817da38596a209d3ad319984fdf070c8d9a2bbcc1a3a16f71d08aaa4",
+  "od": "2026-11-26T18:35:54+00:00",
   "tresc": {
    "linie": [
     "15.12.2025",
@@ -14,6 +14,7 @@
     "Objęcie wniosku oceną nie oznacza gwarancji uzyskania dofinansowania. Przyznanie dofinansowania będzie uzależnione od wyników oceny oraz dostępności środków finansowych.",
     "Kolejne wnioski z listy uznane jako podlegające rejestracji (dotyczy wniosków od nr 56) zostaną skierowane do oceny WYŁĄCZNIE W PRZYPADKU DOSTĘPNOŚCI ŚRODKÓW, po zakończeniu oceny wniosków objętych pierwszą pulą.",
     "Skorygowana lista wniosków",
+    "* w poz. nr 10 i 32 prawidłową datą złożenia wniosków jest 29.09.2026, wskazana data 28.09.2026 wynika z omyłki pisarskiej",
     "Dodatkowe wyjaśnienia dotyczące przyczyny i sposobu ustalenia godzin wpływu wniosków w ramach naboru z dnia 29.09.2026 r.",
     "1.Przyczyna nieprawidłowości w pierwotnym zestawieniu",
     "W pierwotnie opublikowanej liście wniosków (publikacja z dnia 9.10.2026 r.) w przypadku wniosków składanych elektronicznie z powodu błędu pracownika w zestawieniu zamieszczono godziny wysłania wiadomości e-mail przez wnioskodawców, zamiast godzin faktycznego wpływu tych wiadomości na serwer pocztowy LFR (zgodnie z zasadami przyjętymi dla naboru). W konsekwencji pierwotne zestawienie zawierało nieprawidłowe dane dotyczące godzin wpływu wniosków składanych elektronicznie. Nieprawidłowość została zidentyfikowana po zgłoszeniu przez wnioskodawców wątpliwości dotyczących opublikowanych informacji.",
@@ -340,7 +341,13 @@
    ]
   }
  },
- "wyslane": {},
+ "wyslane": {
+  "0941912610997ca1536dc755e7ecc9040848aaa85056b215f40163ec1b331132": {
+   "czas": "2026-11-26T18:35:54+00:00",
+   "typ": "INFO",
+   "opis": "* w poz. nr 10 i 32 prawidłową datą złożenia wniosków jest 29.09.2026, wskazana data 28.09.2026 wynika z omyłki pisarski"
+  }
+ },
  "przypomnienia": [],
  "bledy": {
   "kolejne": 0,
