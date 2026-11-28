@@ -146,3 +146,4 @@
 {"czas": "2026-11-27T10:30:08+00:00", "czas_lokalny": "2026-11-27 11:30:08", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-27T19:36:30+00:00", "czas_lokalny": "2026-11-27 20:36:30", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
 {"czas": "2026-11-28T02:08:38+00:00", "czas_lokalny": "2026-11-28 03:08:38", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 0, "bledy_wysylki": 0, "blad": null}
+{"czas": "2026-11-28T10:17:36+00:00", "czas_lokalny": "2026-11-28 11:17:36", "status_http": 200, "proby": 1, "zmiana": false, "wynik": "ok", "wyslane": 1, "bledy_wysylki": 0, "blad": null}
